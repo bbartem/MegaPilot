@@ -1,0 +1,63 @@
+#	####################################################
+#	СИНТАКСИЧЕСКАЯ РАСКРАСКА ДЛЯ БИБИЛИОТЕКИ:
+#	iarduino_I2C_Matrix_8x8
+#	####################################################
+#	ТИПЫ ДАННЫХ:							   (KEYWORD1)
+	iarduino_I2C_Matrix_8x8	KEYWORD1
+#	####################################################
+#	МЕТОДЫ И ФУНКЦИИ:						   (KEYWORD2)
+	begin	KEYWORD2
+	changeAddress	KEYWORD2
+	reset	KEYWORD2
+	getAddress	KEYWORD2
+	getVersion	KEYWORD2
+	setCoding	KEYWORD2
+	getCoding	KEYWORD2
+	codingDetect	KEYWORD2
+	clrScr	KEYWORD2
+	fillScr	KEYWORD2
+	invScr	KEYWORD2
+	drawImage	KEYWORD2
+	print	KEYWORD2
+	autoScroll	KEYWORD2
+	scrollPos	KEYWORD2
+	scrollDir	KEYWORD2
+	scrollMod	KEYWORD2
+	scrollStep	KEYWORD2
+	setTimeIdleFirst	KEYWORD2
+	setTimeIdleLast	KEYWORD2
+	getScroolLen	KEYWORD2
+	getScroolWidth	KEYWORD2
+	angle	KEYWORD2
+	fps	KEYWORD2
+	bright	KEYWORD2
+	changeChar	KEYWORD2
+	setCharWidth	KEYWORD2
+	getCharWidth	KEYWORD2
+	setCharInterval	KEYWORD2
+	getCharInterval	KEYWORD2
+	setCharIndent	KEYWORD2
+	getCharIndent	KEYWORD2
+	getImage	KEYWORD2
+#	####################################################
+#	КОНСТАНТЫ:								   (LITERAL1)
+	X8_RIPPLES	LITERAL1
+	X8_EMPTY_RIPPLES	LITERAL1
+	X8_FILLED_RIPPLES	LITERAL1
+	X8_DOWN	LITERAL1
+	X8_EMPTY_DOWN	LITERAL1
+	X8_FILLED_DOWN	LITERAL1
+	X8_TOP	LITERAL1
+	X8_EMPTY_TOP	LITERAL1
+	X8_FILLED_TOP	LITERAL1
+	X8_IMG_RAM	LITERAL1
+	X8_IMG_ROM	LITERAL1
+	X8_TXT_UTF8	LITERAL1
+	X8_TXT_CP866	LITERAL1
+	X8_TXT_WIN1251	LITERAL1
+	
+	
+
+	
+	
+	
