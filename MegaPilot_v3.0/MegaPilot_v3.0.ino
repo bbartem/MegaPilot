@@ -1,17 +1,5 @@
-#define BLYNK_PRINT Serial
-
 #include <Adafruit_MCP23X17.h>
 #include <EncButton.h>
-
-#include <SPI.h>
-#include <Ethernet.h>
-#include <BlynkSimpleEthernet.h>
-
-#define W5100_CS  10
-#define SDCARD_CS 4
-
-char auth[] = "9r_nzLAQO2xuX6xOdMaM3I29kd5Md9P7";
-char domain[] = "195.20.119.138";
 
 Adafruit_MCP23X17 mcp1;
 Adafruit_MCP23X17 mcp2;
@@ -72,25 +60,22 @@ Adafruit_MCP23X17 mcp3;
 #define INPUT_PIN14 14
 #define INPUT_PIN15 15
 
-#define COLOR_OFF "#8B0000"
-#define COLOR_ON "#006400"
-
-int button0 = LOW;
-int button1 = LOW;
-int button2 = LOW;
-int button3 = LOW;
-int button4 = LOW;
-int button5 = LOW;
-int button6 = LOW;
-int button7 = LOW;
-int button8 = LOW;
-int button9 = LOW;
-int button10 = LOW;
-int button11 = LOW;
-int button12 = LOW;
-int button13 = LOW;
-int button14 = LOW;
-int button15 = LOW;
+bool button0;
+bool button1;
+bool button2;
+bool button3;
+bool button4;
+bool button5;
+bool button6;
+bool button7;
+bool button8;
+bool button9;
+bool button10;
+bool button11;
+bool button12;
+bool button13;
+bool button14;
+bool button15;
 
 bool output0 = false;
 bool output1 = false;
@@ -148,159 +133,14 @@ EncButton<EB_TICK, VIRT_BTN> btn13;
 EncButton<EB_TICK, VIRT_BTN> btn14;
 EncButton<EB_TICK, VIRT_BTN> btn15;
 
-BLYNK_WRITE(V0)
-{
-  Serial.print("blynk");
-  button0 = param.asInt();
-}
-BLYNK_WRITE(V1)
-{
-  button1 = param.asInt();
-}
-BLYNK_WRITE(V2)
-{
-  button2 = param.asInt();
-}
-BLYNK_WRITE(V3)
-{
-  button3 = param.asInt();
-}
-BLYNK_WRITE(V4)
-{
-  button4 = param.asInt();
-}
-BLYNK_WRITE(V5)
-{
-  button5 = param.asInt();
-}
-BLYNK_WRITE(V6)
-{
-  button6 = param.asInt();
-}
-BLYNK_WRITE(V7)
-{
-  button7 = param.asInt();
-}
-BLYNK_WRITE(V8)
-{
-  button8 = param.asInt();
-}
-BLYNK_WRITE(V9)
-{
-  button9 = param.asInt();
-}
-BLYNK_WRITE(V10)
-{
-  button10 = param.asInt();
-}
-BLYNK_WRITE(V11)
-{
-  button11 = param.asInt();
-}
-BLYNK_WRITE(V12)
-{
-  button12 = param.asInt();
-}
-BLYNK_WRITE(V13)
-{
-  button13 = param.asInt();
-}
-BLYNK_WRITE(V14)
-{
-  button14 = param.asInt();
-}
-BLYNK_WRITE(V15)
-{
-  button15 = param.asInt();
-}
-/*void checkingValues(){
-  Blynk.virtualWrite(V0, output0);
-  Blynk.virtualWrite(V1, output1);
-  Blynk.virtualWrite(V2, output2);
-  Blynk.virtualWrite(V3, output3);
-  Blynk.virtualWrite(V4, output4);
-  Blynk.virtualWrite(V5, output5);
-  Blynk.virtualWrite(V6, output6);
-  Blynk.virtualWrite(V7, output7);
-  Blynk.virtualWrite(V8, output8);
-  Blynk.virtualWrite(V9, output9);
-  Blynk.virtualWrite(V10, output10);
-  Blynk.virtualWrite(V11, output11);
-  Blynk.virtualWrite(V12, output12);
-  Blynk.virtualWrite(V13, output13);
-  Blynk.virtualWrite(V14, output14);
-  Blynk.virtualWrite(V15, output15);
-}*/
-
-WidgetLED led1(V16);
-WidgetLED led2(V17);
-WidgetLED led3(V18);
-WidgetLED led4(V19);
-WidgetLED led5(V20);
-WidgetLED led6(V21);
-WidgetLED led7(V22);
-WidgetLED led8(V23);
-WidgetLED led9(V24);
-WidgetLED led10(V25);
-WidgetLED led11(V26);
-WidgetLED led12(V27);
-WidgetLED led13(V28);
-WidgetLED led14(V29);
-WidgetLED led15(V30);
-WidgetLED led16(V31);
-
-void checkingValuesForColor(){
-  Serial.print("*");
-  if (output0) led1.on();
-  if (output1) led2.on();
-  if (output2) led3.on();
-  if (output3) led4.on();
-  if (output4) led5.on();
-  if (output5) led6.on();
-  if (output6) led7.on();
-  if (output7) led8.on();
-  if (output8) led9.on();
-  if (output9) led10.on();
-  if (output10) led11.on();
-  if (output11) led12.on();
-  if (output12) led13.on();
-  if (output13) led14.on();
-  if (output14) led15.on();
-  if (output15) led16.on();
-  
-  if (!output0) led1.off();
-  if (!output1) led2.off();
-  if (!output2) led3.off();
-  if (!output3) led4.off();
-  if (!output4) led5.off();
-  if (!output5) led6.off();
-  if (!output6) led7.off();
-  if (!output7) led8.off();
-  if (!output8) led9.off();
-  if (!output9) led10.off();
-  if (!output10) led11.off();
-  if (!output11) led12.off();
-  if (!output12) led13.off();
-  if (!output13) led14.off();
-  if (!output14) led15.off();
-  if (!output15) led16.off();
-}
-
-void setup(){
+void setup() {
   Serial.begin(9600);
-
-  Blynk.begin(auth, domain);
-
-  pinMode(SDCARD_CS, OUTPUT);
-  digitalWrite(SDCARD_CS, HIGH);
 
   Serial.println("Start MegaPilot");
 
   mcp1.begin_I2C(addr1); 
   mcp2.begin_I2C(addr2); 
   mcp3.begin_I2C(addr3);
-
-  
 
   mcp1.pinMode(OUTPUT_PIN0, OUTPUT);
   mcp1.pinMode(OUTPUT_PIN1, OUTPUT);
@@ -405,46 +245,7 @@ void setup(){
   mcp3.digitalWrite(OUTPUT_PIN31, function15); //
 }
 
-void loop(){
-  Serial.print("/");
-  btn0.tick(!mcp2.digitalRead(INPUT_PIN0));
-  btn1.tick(!mcp2.digitalRead(INPUT_PIN1));
-  btn2.tick(!mcp2.digitalRead(INPUT_PIN2));
-  btn3.tick(!mcp2.digitalRead(INPUT_PIN3));
-  btn4.tick(!mcp2.digitalRead(INPUT_PIN4));
-  btn5.tick(!mcp2.digitalRead(INPUT_PIN5));
-  btn6.tick(!mcp2.digitalRead(INPUT_PIN6));
-  btn7.tick(!mcp2.digitalRead(INPUT_PIN7));
-  btn8.tick(!mcp2.digitalRead(INPUT_PIN8));
-  btn9.tick(!mcp2.digitalRead(INPUT_PIN9));
-  btn10.tick(!mcp2.digitalRead(INPUT_PIN10));
-  btn11.tick(!mcp2.digitalRead(INPUT_PIN11));
-  btn12.tick(!mcp2.digitalRead(INPUT_PIN12));
-  btn13.tick(!mcp2.digitalRead(INPUT_PIN13));
-  btn14.tick(!mcp2.digitalRead(INPUT_PIN14));
-  btn15.tick(!mcp2.digitalRead(INPUT_PIN15));
-
-  btn0.tick(button0);
-  btn1.tick(button1);
-  btn2.tick(button2);
-  btn3.tick(button3);
-  btn4.tick(button4);
-  btn5.tick(button5);
-  btn6.tick(button6);
-  btn7.tick(button7);
-  btn8.tick(button8);
-  btn9.tick(button9);
-  btn10.tick(button10);
-  btn11.tick(button11);
-  btn12.tick(button12);
-  btn13.tick(button13);
-  btn14.tick(button14);
-  btn15.tick(button15);
-
-  Blynk.run();
-
-  checkingValuesForColor();
-  Serial.println("1");
+void loop() {
   if (btn0.click()){
     output0 = !output0;
     mcp1.digitalWrite(OUTPUT_PIN0, output0);
@@ -782,5 +583,23 @@ void loop(){
     Serial.print("\t Функция 15: ");
     Serial.println(!function15);
   }
+}
 
+void yield() {
+  btn0.tick(!mcp2.digitalRead(INPUT_PIN0));
+  btn1.tick(!mcp2.digitalRead(INPUT_PIN1));
+  btn2.tick(!mcp2.digitalRead(INPUT_PIN2));
+  btn3.tick(!mcp2.digitalRead(INPUT_PIN3));
+  btn4.tick(!mcp2.digitalRead(INPUT_PIN4));
+  btn5.tick(!mcp2.digitalRead(INPUT_PIN5));
+  btn6.tick(!mcp2.digitalRead(INPUT_PIN6));
+  btn7.tick(!mcp2.digitalRead(INPUT_PIN7));
+  btn8.tick(!mcp2.digitalRead(INPUT_PIN8));
+  btn9.tick(!mcp2.digitalRead(INPUT_PIN9));
+  btn10.tick(!mcp2.digitalRead(INPUT_PIN10));
+  btn11.tick(!mcp2.digitalRead(INPUT_PIN11));
+  btn12.tick(!mcp2.digitalRead(INPUT_PIN12));
+  btn13.tick(!mcp2.digitalRead(INPUT_PIN13));
+  btn14.tick(!mcp2.digitalRead(INPUT_PIN14));
+  btn15.tick(!mcp2.digitalRead(INPUT_PIN15));
 }
