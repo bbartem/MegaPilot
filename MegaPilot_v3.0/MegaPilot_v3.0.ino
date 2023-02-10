@@ -246,6 +246,23 @@ void setup() {
 }
 
 void loop() {
+  btn0.tick(!mcp2.digitalRead(INPUT_PIN0));
+  btn1.tick(!mcp2.digitalRead(INPUT_PIN1));
+  btn2.tick(!mcp2.digitalRead(INPUT_PIN2));
+  btn3.tick(!mcp2.digitalRead(INPUT_PIN3));
+  btn4.tick(!mcp2.digitalRead(INPUT_PIN4));
+  btn5.tick(!mcp2.digitalRead(INPUT_PIN5));
+  btn6.tick(!mcp2.digitalRead(INPUT_PIN6));
+  btn7.tick(!mcp2.digitalRead(INPUT_PIN7));
+  btn8.tick(!mcp2.digitalRead(INPUT_PIN8));
+  btn9.tick(!mcp2.digitalRead(INPUT_PIN9));
+  btn10.tick(!mcp2.digitalRead(INPUT_PIN10));
+  btn11.tick(!mcp2.digitalRead(INPUT_PIN11));
+  btn12.tick(!mcp2.digitalRead(INPUT_PIN12));
+  btn13.tick(!mcp2.digitalRead(INPUT_PIN13));
+  btn14.tick(!mcp2.digitalRead(INPUT_PIN14));
+  btn15.tick(!mcp2.digitalRead(INPUT_PIN15));
+
   if (btn0.click()){
     output0 = !output0;
     mcp1.digitalWrite(OUTPUT_PIN0, output0);
