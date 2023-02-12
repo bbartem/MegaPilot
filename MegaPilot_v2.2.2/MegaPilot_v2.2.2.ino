@@ -268,6 +268,120 @@ BLYNK_WRITE(V15)
     Serial.println(output15);
 }
 
+BLYNK_WRITE(V16)
+{
+  function0 = param.asInt();
+    mcp3.digitalWrite(OUTPUT_PIN16, function0);
+    Serial.print("blynk: Подсобка(дверь) - ");
+    Serial.println(function0);
+}
+BLYNK_WRITE(V17)
+{
+  function1 = param.asInt();
+    mcp3.digitalWrite(OUTPUT_PIN17, function1);
+    Serial.print("blynk: Розетка - ");
+    Serial.println(function1);
+}
+BLYNK_WRITE(V18)
+{
+  function2 = param.asInt();
+    mcp3.digitalWrite(OUTPUT_PIN18, function2);
+    Serial.print("blynk: function2 - ");
+    Serial.println(function2);
+}
+BLYNK_WRITE(V19)
+{
+  function3 = param.asInt();
+    mcp3.digitalWrite(OUTPUT_PIN19, function3);
+    Serial.print("blynk: Балкон(дверь) - ");
+    Serial.println(function3);
+}
+BLYNK_WRITE(V20)
+{
+  function4 = param.asInt();
+    mcp3.digitalWrite(OUTPUT_PIN20, function4);
+    Serial.print("blynk: function4 - ");
+    Serial.println(function4);
+}
+BLYNK_WRITE(V21)
+{
+  function5 = param.asInt();
+    mcp3.digitalWrite(OUTPUT_PIN21, function5);
+    Serial.print("blynk: function5 - ");
+    Serial.println(function5);
+}
+BLYNK_WRITE(V22)
+{
+  function6 = param.asInt();
+    mcp3.digitalWrite(OUTPUT_PIN22, function6);
+    Serial.print("blynk: function6 - ");
+    Serial.println(function6);
+}
+BLYNK_WRITE(V23)
+{
+  function7 = param.asInt();
+    mcp3.digitalWrite(OUTPUT_PIN23, function7);
+    Serial.print("blynk: Лампочка - ");
+    Serial.println(function7);
+}
+BLYNK_WRITE(V24)
+{
+  function8 = param.asInt();
+    mcp3.digitalWrite(OUTPUT_PIN24, function8);
+    Serial.print("blynk: function8 - ");
+    Serial.println(function8);
+}
+BLYNK_WRITE(V25)
+{
+  function9 = param.asInt();
+    mcp3.digitalWrite(OUTPUT_PIN25, function9);
+    Serial.print("blynk: function9 - ");
+    Serial.println(function9);
+}
+BLYNK_WRITE(V26)
+{
+  function10 = param.asInt();
+    mcp3.digitalWrite(OUTPUT_PIN26, function10);
+    Serial.print("blynk: function10 - ");
+    Serial.println(function10);
+}
+BLYNK_WRITE(V27)
+{
+  function11 = param.asInt();
+    mcp3.digitalWrite(OUTPUT_PIN27, function11);
+    Serial.print("blynk: function11 - ");
+    Serial.println(function11);
+}
+BLYNK_WRITE(V28)
+{
+  function12 = param.asInt();
+    mcp3.digitalWrite(OUTPUT_PIN28, function12);
+    Serial.print("blynk: function12 - ");
+    Serial.println(function12);
+}
+BLYNK_WRITE(V29)
+{
+  function13 = param.asInt();
+    mcp3.digitalWrite(OUTPUT_PIN29, function13);
+    Serial.print("blynk: function13 - ");
+    Serial.println(function13);
+}
+BLYNK_WRITE(V30)
+{
+  function14 = param.asInt();
+    mcp3.digitalWrite(OUTPUT_PIN30, function14);
+    Serial.print("blynk: function14 - ");
+    Serial.println(function14);
+}
+BLYNK_WRITE(V31)
+{
+  function15 = param.asInt();
+    mcp3.digitalWrite(OUTPUT_PIN31, function15);
+    Serial.print("blynk: function15 - ");
+    Serial.println(function15);
+}
+
+
 void checkingValues(){
   /*Blynk.virtualWrite(V0, output0);
   Blynk.virtualWrite(V1, output1);
@@ -564,98 +678,121 @@ void cheking(){
   if (btn0.held()){
     function0 = !function0;
     mcp3.digitalWrite(OUTPUT_PIN16, function0);
+    Blynk.virtualWrite(V16, function0);
+    Serial.print("\t Функция 0: ");
+    Serial.println(!function10);
+    delay(200);
+    function0 = !function0;
+    mcp3.digitalWrite(OUTPUT_PIN16, function0);
+    Blynk.virtualWrite(V16, function0);
     Serial.print("\t Функция 0: ");
     Serial.println(!function10);
   }
   if (btn1.held()){
     function1 = !function1;
     mcp3.digitalWrite(OUTPUT_PIN17, function1);
+    Blynk.virtualWrite(V17, function1);
     function7 = !function7;
     mcp3.digitalWrite(OUTPUT_PIN23, function7);
+    Blynk.virtualWrite(V23, function7);
     Serial.print("\t Функция 1: ");
     Serial.println(!function1);
   }
   if (btn2.held()){
     function2 = !function2;
     mcp3.digitalWrite(OUTPUT_PIN18, function2);
+    Blynk.virtualWrite(V18, function2);
     Serial.print("\t Функция 2: ");
     Serial.println(!function2);
   }
   if (btn3.held()){
     function3 = !function3;
     mcp3.digitalWrite(OUTPUT_PIN19, function3);
+    Blynk.virtualWrite(V19, function3);
     Serial.print("\t Функция 3: ");
     Serial.println(!function3);
   }
   if (btn4.held()){
     function4 = !function4;
     mcp3.digitalWrite(OUTPUT_PIN20, function4);
+    Blynk.virtualWrite(V20, function4);
     Serial.print("\t Функция 4: ");
     Serial.println(!function4);
   }
   if (btn5.held()){
     function5 = !function5;
     mcp3.digitalWrite(OUTPUT_PIN21, function5);
+    Blynk.virtualWrite(V21, function5);
     Serial.print("\t Функция 5: ");
     Serial.println(!function5);
   }
   if (btn6.held()){
     function6 = !function6;
     mcp3.digitalWrite(OUTPUT_PIN22, function6);
+    Blynk.virtualWrite(V22, function6);
     Serial.print("\t Функция 6: ");
     Serial.println(!function6);
   }
   if (btn7.held()){
     function7 = !function7;
     mcp3.digitalWrite(OUTPUT_PIN23, function7);
+    Blynk.virtualWrite(V23, function7);
     Serial.print("\t Функция 7: ");
     Serial.println(!function7);
   }
   if (btn8.held()){
     function8 = !function8;
     mcp3.digitalWrite(OUTPUT_PIN24, function8);
+    Blynk.virtualWrite(V24, function8);
     Serial.print("\t Функция 8: ");
     Serial.println(!function8);
   }
   if (btn9.held()){
     function9 = !function9;
     mcp3.digitalWrite(OUTPUT_PIN25, function9);
+    Blynk.virtualWrite(V25, function9);
     Serial.print("\t Функция 9: ");
     Serial.println(!function9);
   }
   if (btn10.held()){
     function10 = !function10;
     mcp3.digitalWrite(OUTPUT_PIN26, function10);
+    Blynk.virtualWrite(V26, function10);
     Serial.print("\t Функция 10: ");
     Serial.println(!function10);
   }
   if (btn11.held()){
     function11 = !function11;
     mcp3.digitalWrite(OUTPUT_PIN27, function11);
+    Blynk.virtualWrite(V27, function11);
     Serial.print("\t Функция 11: ");
     Serial.println(!function11);
   }
   if (btn12.held()){
     function12 = !function12;
     mcp3.digitalWrite(OUTPUT_PIN28, function12);
+    Blynk.virtualWrite(V28, function12);
     Serial.print("\t Функция 12: ");
     Serial.println(!function12);
   }
   if (btn13.held()){
     function13 = !function13;
     mcp3.digitalWrite(OUTPUT_PIN29, function13);
+    Blynk.virtualWrite(V29, function13);
     Serial.print("\t Функция 13: ");
     Serial.println(!function13);
   }
   if (btn14.held()){
     function14 = !function14;
     mcp3.digitalWrite(OUTPUT_PIN30, function14);
+    Blynk.virtualWrite(V30, function14);    
     Serial.print("\t Функция 14: ");
     Serial.println(!function4);
   }
   if (btn15.held()){
     function15 = !function15;
     mcp3.digitalWrite(OUTPUT_PIN31, function15);
+    Blynk.virtualWrite(V31, function15);
     Serial.print("\t Функция 15: ");
     Serial.println(!function15);
   }
