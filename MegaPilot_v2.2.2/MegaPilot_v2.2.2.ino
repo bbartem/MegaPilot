@@ -20,6 +20,9 @@ char domain[] = "195.20.119.138";
 BlynkTimer timer;
 BlynkTimer timer2;
 
+extern int __bss_end;
+extern void *__brkval;
+
 Adafruit_MCP23X17 mcp1;
 Adafruit_MCP23X17 mcp2;
 Adafruit_MCP23X17 mcp3;
@@ -229,6 +232,8 @@ BLYNK_WRITE(V10)
 {
   output10 = param.asInt();
     mcp1.digitalWrite(OUTPUT_PIN10, output10);
+    __script2();
+    script2 = !script2;
     Serial.print("blynk: Сценарий2 - ");
     Serial.println(output10);
 }
@@ -236,6 +241,8 @@ BLYNK_WRITE(V11)
 {
   output11 = param.asInt();
     mcp1.digitalWrite(OUTPUT_PIN11, output11);
+    __script1();
+    script1 = !script1;
     Serial.print("blynk: Сценарий1 - ");
     Serial.println(output11);
 }
@@ -383,7 +390,7 @@ BLYNK_WRITE(V31)
 
 
 void checkingValues(){
-  /*Blynk.virtualWrite(V0, output0);
+  Blynk.virtualWrite(V0, output0);
   Blynk.virtualWrite(V1, output1);
   Blynk.virtualWrite(V2, output2);
   Blynk.virtualWrite(V3, output3);
@@ -398,8 +405,163 @@ void checkingValues(){
   Blynk.virtualWrite(V12, output12);
   Blynk.virtualWrite(V13, output13);
   Blynk.virtualWrite(V14, output14);
-  Blynk.virtualWrite(V15, output15);*/
-  //Serial.print("*");
+  Blynk.virtualWrite(V15, output15);
+  Serial.print("*");
+}
+
+void memoryFree(){
+   int freeValue;
+   if((int)__brkval == 0)
+      freeValue = ((int)&freeValue) - ((int)&__bss_end);
+   else
+      freeValue = ((int)&freeValue) - ((int)__brkval);
+    Serial.println(freeValue);
+}
+void __script1(){
+  if (!script1){
+      Serial.println("Сценарий 1(ВКЛ) запущен");
+      
+      output0 = true;
+      output1 = true;
+      output2 = true;
+      output3 = true;
+      output4 = true;
+      output5 = true;
+      output6 = true;
+      output7 = true;
+      output8 = true;
+      output9 = true;
+      output13 = true;
+      output14 = true;
+      output15 = true;
+      
+      Serial.println("отладка на зависание 1");
+
+      mcp1.digitalWrite(OUTPUT_PIN0, output0); //- Пульт
+      delay(200);
+      mcp1.digitalWrite(OUTPUT_PIN1, output1); //- Камера
+      delay(200);
+      mcp1.digitalWrite(OUTPUT_PIN2, output2); //- Розетки сцена
+      delay(200);
+      mcp1.digitalWrite(OUTPUT_PIN3, output3); //- Микрофоны
+      delay(200);
+      mcp1.digitalWrite(OUTPUT_PIN4, output4); //- Коммутация
+      delay(200);
+      mcp1.digitalWrite(OUTPUT_PIN9, output9); //- Проектор
+      delay(2000);
+      mcp1.digitalWrite(OUTPUT_PIN5, output5); //- Трансляция
+      delay(2000);
+      mcp1.digitalWrite(OUTPUT_PIN6, output6); //- Мониторы
+      delay(2000);
+      mcp1.digitalWrite(OUTPUT_PIN7, output7); //- Порталы
+      delay(500);
+      mcp1.digitalWrite(OUTPUT_PIN14, output14); //- Свет
+      mcp1.digitalWrite(OUTPUT_PIN15, output15); //- Свет
+      delay(500);
+      mcp1.digitalWrite(OUTPUT_PIN8, output8); //- Свет(кафедра)
+      delay(500);
+      mcp1.digitalWrite(OUTPUT_PIN13, output13); //- Свет(рояль)
+      delay(200);
+      Serial.println("Сценарий 1(ВКЛ) завершен");
+    }
+    if (script1){
+      Serial.println("Сценарий 1(ВЫКЛ) запущен");
+
+      output0 = false;
+      output1 = false;
+      output2 = false;
+      output3 = false;
+      output4 = false;
+      output5 = false;
+      output6 = false;
+      output7 = false;
+      output8 = false;
+      output9 = false;
+      output12 = false;
+      output13 = false;
+      output14 = false;
+      output15 = false;
+
+      mcp1.digitalWrite(OUTPUT_PIN5, output5); //- Трансляция
+      delay(2000);
+      mcp1.digitalWrite(OUTPUT_PIN6, output6); //- Мониторы
+      delay(2000);
+      mcp1.digitalWrite(OUTPUT_PIN7, output7); //- Порталы
+      delay(500);
+      mcp1.digitalWrite(OUTPUT_PIN0, output0); //- Пульт
+      delay(200);
+      mcp1.digitalWrite(OUTPUT_PIN1, output1); //- Камера
+      delay(200);
+      mcp1.digitalWrite(OUTPUT_PIN2, output2); //- Розетки сцена
+      delay(200);
+      mcp1.digitalWrite(OUTPUT_PIN3, output3); //- Микрофоны
+      delay(200);
+      mcp1.digitalWrite(OUTPUT_PIN4, output4); //- Коммутация
+      delay(200);
+      mcp1.digitalWrite(OUTPUT_PIN9, output9); //- Проектор
+      delay(500);
+      mcp1.digitalWrite(OUTPUT_PIN14, output14); //- Свет
+      mcp1.digitalWrite(OUTPUT_PIN15, output15); //- Свет
+      delay(500);
+      mcp1.digitalWrite(OUTPUT_PIN12, output12); //- Свет(Хор)
+      delay(500);
+      mcp1.digitalWrite(OUTPUT_PIN8, output8); //- Свет(кафедра)
+      delay(500);
+      mcp1.digitalWrite(OUTPUT_PIN13, output13); //- Свет(рояль)
+      delay(200);
+      Serial.println("Сценарий 1(ВЫКЛ) завершен");
+    }
+    checkingValues();
+}
+void __script2(){
+  if (!script2){
+      Serial.println("Сценарий 2(ВКЛ) запущен");
+      
+      output0 = true;
+      output2 = true;
+      output3 = true;
+      output4 = true;
+      output6 = true;
+      output7 = true;
+
+      mcp1.digitalWrite(OUTPUT_PIN0, output0); //- Пульт
+      delay(200);
+      mcp1.digitalWrite(OUTPUT_PIN2, output2); //- Розетки сцена
+      delay(200);
+      mcp1.digitalWrite(OUTPUT_PIN3, output3); //- Микрофоны
+      delay(200);
+      mcp1.digitalWrite(OUTPUT_PIN4, output4); //- Коммутация
+      delay(200);
+      mcp1.digitalWrite(OUTPUT_PIN6, output6); //- Мониторы
+      delay(2000);
+      mcp1.digitalWrite(OUTPUT_PIN7, output7); //- Порталы
+      Serial.println("Сценарий 2(ВКЛ) завершен");
+    }
+    if (script2){
+      Serial.println("Сценарий 2(ВЫКЛ) запущен");
+
+      output0 = false;
+      output2 = false;
+      output3 = false;
+      output4 = false;
+      output6 = false;
+      output7 = false;
+
+      mcp1.digitalWrite(OUTPUT_PIN6, output6); //- Мониторы
+      delay(2000);
+      mcp1.digitalWrite(OUTPUT_PIN7, output7); //- Порталы
+      delay(500);
+      mcp1.digitalWrite(OUTPUT_PIN0, output0); //- Пульт
+      delay(200);
+      mcp1.digitalWrite(OUTPUT_PIN2, output2); //- Розетки сцена
+      delay(200);
+      mcp1.digitalWrite(OUTPUT_PIN3, output3); //- Микрофоны
+      delay(200);
+      mcp1.digitalWrite(OUTPUT_PIN4, output4); //- Коммутация
+      delay(200);
+      Serial.println("Сценарий 2(ВЫКЛ) завершен");
+    }
+    checkingValues();
 }
 
 void cheking(){
@@ -496,53 +658,7 @@ void cheking(){
     Blynk.virtualWrite(V10, output10);
     Serial.println("btn: Сценарий2 - ");
     Serial.println(output10);
-    if (!script2){
-      Serial.println("Сценарий 2(ВКЛ) запущен");
-      
-      output0 = true;
-      output2 = true;
-      output3 = true;
-      output4 = true;
-      output6 = true;
-      output7 = true;
-
-      mcp1.digitalWrite(OUTPUT_PIN0, output0); //- Пульт
-      delay(200);
-      mcp1.digitalWrite(OUTPUT_PIN2, output2); //- Розетки сцена
-      delay(200);
-      mcp1.digitalWrite(OUTPUT_PIN3, output3); //- Микрофоны
-      delay(200);
-      mcp1.digitalWrite(OUTPUT_PIN4, output4); //- Коммутация
-      delay(200);
-      mcp1.digitalWrite(OUTPUT_PIN6, output6); //- Мониторы
-      delay(2000);
-      mcp1.digitalWrite(OUTPUT_PIN7, output7); //- Порталы
-      Serial.println("Сценарий 2(ВКЛ) завершен");
-    }
-    if (script2){
-      Serial.println("Сценарий 2(ВЫКЛ) запущен");
-
-      output0 = false;
-      output2 = false;
-      output3 = false;
-      output4 = false;
-      output6 = false;
-      output7 = false;
-
-      mcp1.digitalWrite(OUTPUT_PIN6, output6); //- Мониторы
-      delay(2000);
-      mcp1.digitalWrite(OUTPUT_PIN7, output7); //- Порталы
-      delay(500);
-      mcp1.digitalWrite(OUTPUT_PIN0, output0); //- Пульт
-      delay(200);
-      mcp1.digitalWrite(OUTPUT_PIN2, output2); //- Розетки сцена
-      delay(200);
-      mcp1.digitalWrite(OUTPUT_PIN3, output3); //- Микрофоны
-      delay(200);
-      mcp1.digitalWrite(OUTPUT_PIN4, output4); //- Коммутация
-      delay(200);
-      Serial.println("Сценарий 2(ВЫКЛ) завершен");
-    }
+    __script2();
     script2 = !script2;
   }
   if (btn11.click()){
@@ -551,99 +667,7 @@ void cheking(){
     Blynk.virtualWrite(V11, output11);
     Serial.println("btn: Сценарий1 - ON");
     Serial.println(output11);
-    if (!script1){
-      Serial.println("Сценарий 1(ВКЛ) запущен");
-      
-      output0 = true;
-      output1 = true;
-      output2 = true;
-      output3 = true;
-      output4 = true;
-      output5 = true;
-      output6 = true;
-      output7 = true;
-      output8 = true;
-      output9 = true;
-      output13 = true;
-      output14 = true;
-      output15 = true;
-      
-      Serial.println("отладка на зависание 1");
-
-      mcp1.digitalWrite(OUTPUT_PIN0, output0); //- Пульт
-      delay(200);
-      mcp1.digitalWrite(OUTPUT_PIN1, output1); //- Камера
-      delay(200);
-      mcp1.digitalWrite(OUTPUT_PIN2, output2); //- Розетки сцена
-      delay(200);
-      mcp1.digitalWrite(OUTPUT_PIN3, output3); //- Микрофоны
-      delay(200);
-      mcp1.digitalWrite(OUTPUT_PIN4, output4); //- Коммутация
-      delay(200);
-      mcp1.digitalWrite(OUTPUT_PIN9, output9); //- Проектор
-      delay(2000);
-      mcp1.digitalWrite(OUTPUT_PIN5, output5); //- Трансляция
-      delay(2000);
-      mcp1.digitalWrite(OUTPUT_PIN6, output6); //- Мониторы
-      delay(2000);
-      mcp1.digitalWrite(OUTPUT_PIN7, output7); //- Порталы
-      delay(500);
-      mcp1.digitalWrite(OUTPUT_PIN14, output14); //- Свет
-      mcp1.digitalWrite(OUTPUT_PIN15, output15); //- Свет
-      delay(500);
-      mcp1.digitalWrite(OUTPUT_PIN8, output8); //- Свет(кафедра)
-      delay(500);
-      mcp1.digitalWrite(OUTPUT_PIN13, output13); //- Свет(рояль)
-      delay(200);
-      Serial.println("Сценарий 1(ВКЛ) завершен");
-    }
-    if (script1){
-      Serial.println("Сценарий 1(ВЫКЛ) запущен");
-
-      output0 = false;
-      output1 = false;
-      output2 = false;
-      output3 = false;
-      output4 = false;
-      output5 = false;
-      output6 = false;
-      output7 = false;
-      output8 = false;
-      output9 = false;
-      output12 = false;
-      output13 = false;
-      output14 = false;
-      output15 = false;
-
-      mcp1.digitalWrite(OUTPUT_PIN5, output5); //- Трансляция
-      delay(2000);
-      mcp1.digitalWrite(OUTPUT_PIN6, output6); //- Мониторы
-      delay(2000);
-      mcp1.digitalWrite(OUTPUT_PIN7, output7); //- Порталы
-      delay(500);
-      mcp1.digitalWrite(OUTPUT_PIN0, output0); //- Пульт
-      delay(200);
-      mcp1.digitalWrite(OUTPUT_PIN1, output1); //- Камера
-      delay(200);
-      mcp1.digitalWrite(OUTPUT_PIN2, output2); //- Розетки сцена
-      delay(200);
-      mcp1.digitalWrite(OUTPUT_PIN3, output3); //- Микрофоны
-      delay(200);
-      mcp1.digitalWrite(OUTPUT_PIN4, output4); //- Коммутация
-      delay(200);
-      mcp1.digitalWrite(OUTPUT_PIN9, output9); //- Проектор
-      delay(500);
-      mcp1.digitalWrite(OUTPUT_PIN14, output14); //- Свет
-      mcp1.digitalWrite(OUTPUT_PIN15, output15); //- Свет
-      delay(500);
-      mcp1.digitalWrite(OUTPUT_PIN12, output12); //- Свет(Хор)
-      delay(500);
-      mcp1.digitalWrite(OUTPUT_PIN8, output8); //- Свет(кафедра)
-      delay(500);
-      mcp1.digitalWrite(OUTPUT_PIN13, output13); //- Свет(рояль)
-      delay(200);
-      Serial.println("Сценарий 1(ВЫКЛ) завершен");
-    }
+    __script1();
     script1 = !script1;
   }
   if (btn12.click()){
@@ -808,7 +832,7 @@ void setup(){
   pinMode(SDCARD_CS, OUTPUT);
   digitalWrite(SDCARD_CS, HIGH);
 
-  OS.attach(0, checkingValues, 250);
+  OS.attach(0, memoryFree, 1000);
   OS.attach(1, cheking, 50);
 
   Serial.println("Start MegaPilot");
