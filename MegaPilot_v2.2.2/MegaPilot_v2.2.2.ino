@@ -16,6 +16,9 @@ GyverOS<2> OS;
 
 char auth[] = "9r_nzLAQO2xuX6xOdMaM3I29kd5Md9P7";
 char domain[] = "195.20.119.138";
+//char port[] = "9444";
+
+IPAddress arduino_ip ( 192,   168,   1,  199);
 
 BlynkTimer timer;
 BlynkTimer timer2;
@@ -692,7 +695,7 @@ void cheking(){
     Serial.println(output14);
   }
   if (btn15.click()){
-    output15 = !output0;
+    output15 = !output14;
     mcp1.digitalWrite(OUTPUT_PIN15, output15);
     Blynk.virtualWrite(V15, output15);
     Serial.println("btn: Свет(сцена2) - ON");
@@ -827,7 +830,7 @@ void cheking(){
 void setup(){
   Serial.begin(9600);
 
-  Blynk.begin(auth, domain);
+  Blynk.begin(auth, domain, 9444);
 
   pinMode(SDCARD_CS, OUTPUT);
   digitalWrite(SDCARD_CS, HIGH);
