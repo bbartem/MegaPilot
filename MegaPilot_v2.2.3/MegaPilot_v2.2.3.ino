@@ -26,9 +26,11 @@ IPAddress ip(192, 168, 1, 199);
 IPAddress gateway(192, 168, 1, 1);
 // Подсеть
 IPAddress subnet(255, 255, 255, 0);
+// Порт веб-сервера
+EthernetServer server(80);
 
-BlynkTimer timer;
-BlynkTimer timer2;
+//BlynkTimer timer;
+//BlynkTimer timer2;
 
 extern int __bss_end;
 extern void *__brkval;
@@ -400,7 +402,6 @@ BLYNK_WRITE(V31)
     Serial.println(function15);
 }
 
-
 void checkingValues(){
   Blynk.virtualWrite(V0, output0);
   Blynk.virtualWrite(V1, output1);
@@ -420,7 +421,6 @@ void checkingValues(){
   Blynk.virtualWrite(V15, output15);
   Serial.print("*");
 }
-
 void memoryFree(){
    int freeValue;
    if((int)__brkval == 0)
@@ -931,6 +931,22 @@ void checkConnection() {
   }
 }
 
+void handleClient(EthernetClient client) {
+  if (client.connected()) {
+    client.println("HTTP/1.1 200 OK");
+    client.println("Content-Type: text/html");
+    client.println();
+
+    client.println("<html><body>");
+    client.println("<h1>MegaPilot</h1>");
+    client.println("<p>MegaPilot_v2.2.3</p>");
+    client.println("<p>https://github.com/bbartem/MegaPilot.git</p>");
+    client.println("</body></html>");
+
+    client.stop();
+  }
+}
+
 void setup(){
   Serial.begin(9600);
 
@@ -941,6 +957,8 @@ void setup(){
   BBtimer.setInterval(1000, memoryFree);
   BBtimer.setInterval(900, checkConnection);
   BBtimer.setInterval(50, cheking);
+
+  server.begin();
 
   SPI.begin();
 
@@ -1060,7 +1078,12 @@ void setup(){
 }
 
 void loop(){
-  timer.run();
+  BBtimer.run();
   //OS.tick();
   Blynk.run();
+
+  EthernetClient client = server.available();
+  if (client) {
+    handleClient(client);
+  }
 }
