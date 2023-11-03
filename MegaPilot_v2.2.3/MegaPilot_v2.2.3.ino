@@ -403,6 +403,7 @@ BLYNK_WRITE(V31)
 }
 
 void checkingValues(){
+  Serial.println("checkingValues()");
   Blynk.virtualWrite(V0, output0);
   Blynk.virtualWrite(V1, output1);
   Blynk.virtualWrite(V2, output2);
@@ -430,12 +431,17 @@ void memoryFree(){
     Serial.println(freeValue);
 }
 void __script1() {
+  Serial.println("__script1()");
   static unsigned long startTime = 0;
   static int step = 0;
+  unsigned long interval = 200;
+  unsigned long longInterval = 2000;
+  unsigned long shortInterval = 500;
   
   if (!script1) {
     Serial.println("Сценарий 1(ВКЛ) запущен");
-    
+    startTime = millis();
+    step = 0;
     output0 = true;
     output1 = true;
     output2 = true;
@@ -449,12 +455,6 @@ void __script1() {
     output13 = true;
     output14 = true;
     output15 = true;
-    
-    Serial.println("отладка на зависание 1");
-    
-    unsigned long interval = 200; // Интервал для первых 7 операций
-    unsigned long longInterval = 2000; // Интервал для следующих 2 операций
-    unsigned long shortInterval = 500; // Интервал для последних 3 операций
     
     if (step == 0 && millis() - startTime >= interval * step) {
       mcp1.digitalWrite(OUTPUT_PIN0, output0); //- Пульт
@@ -517,10 +517,11 @@ void __script1() {
       Serial.println("Сценарий 1(ВКЛ) завершен");
     }
   }
-  
   if (script1) {
     Serial.println("Сценарий 1(ВЫКЛ) запущен");
-    
+
+    startTime = millis();
+    step = 0;
     output0 = false;
     output1 = false;
     output2 = false;
@@ -535,74 +536,87 @@ void __script1() {
     output13 = false;
     output14 = false;
     output15 = false;
-    
-    if (step == 0) {
-      mcp1.digitalWrite(OUTPUT_PIN5, output5); //- Трансляция
+        
+    if (step == 0 && millis() - startTime >= interval * step) {
+        mcp1.digitalWrite(OUTPUT_PIN5, output5); //- Трансляция
+        step++;
     }
     
-    if (step == 1) {
-      mcp1.digitalWrite(OUTPUT_PIN6, output6); //- Мониторы
+    if (step == 1 && millis() - startTime >= interval * step + longInterval) {
+        mcp1.digitalWrite(OUTPUT_PIN6, output6); //- Мониторы
+        step++;
     }
     
-    if (step == 2) {
-      mcp1.digitalWrite(OUTPUT_PIN7, output7); //- Порталы
+    if (step == 2 && millis() - startTime >= interval * step + longInterval * 2) {
+        mcp1.digitalWrite(OUTPUT_PIN7, output7); //- Порталы
+        step++;
     }
     
-    if (step == 3) {
-      mcp1.digitalWrite(OUTPUT_PIN0, output0); //- Пульт
+    if (step == 3 && millis() - startTime >= interval * step + shortInterval) {
+        mcp1.digitalWrite(OUTPUT_PIN0, output0); //- Пульт
+        step++;
     }
     
-    if (step == 4) {
-      mcp1.digitalWrite(OUTPUT_PIN1, output1); //- Камера
+    if (step == 4 && millis() - startTime >= interval * step + shortInterval * 2) {
+        mcp1.digitalWrite(OUTPUT_PIN1, output1); //- Камера
+        step++;
     }
     
-    if (step == 5) {
-      mcp1.digitalWrite(OUTPUT_PIN2, output2); //- Розетки сцена
+    if (step == 5 && millis() - startTime >= interval * step + shortInterval * 3) {
+        mcp1.digitalWrite(OUTPUT_PIN2, output2); //- Розетки сцена
+        step++;
     }
     
-    if (step == 6) {
-      mcp1.digitalWrite(OUTPUT_PIN3, output3); //- Микрофоны
+    if (step == 6 && millis() - startTime >= interval * step + shortInterval * 4) {
+        mcp1.digitalWrite(OUTPUT_PIN3, output3); //- Микрофоны
+        step++;
     }
     
-    if (step == 7) {
-      mcp1.digitalWrite(OUTPUT_PIN4, output4); //- Коммутация
+    if (step == 7 && millis() - startTime >= interval * step + shortInterval * 5) {
+        mcp1.digitalWrite(OUTPUT_PIN4, output4); //- Коммутация
+        step++;
     }
     
-    if (step == 8) {
-      mcp1.digitalWrite(OUTPUT_PIN9, output9); //- Проектор
+    if (step == 8 && millis() - startTime >= interval * step + shortInterval * 6) {
+        mcp1.digitalWrite(OUTPUT_PIN9, output9); //- Проектор
+        step++;
     }
     
-    if (step == 9) {
-      mcp1.digitalWrite(OUTPUT_PIN14, output14); //- Свет
-      mcp1.digitalWrite(OUTPUT_PIN15, output15); //- Свет
+    if (step == 9 && millis() - startTime >= interval * step + shortInterval * 7) {
+        mcp1.digitalWrite(OUTPUT_PIN14, output14); //- Свет
+        mcp1.digitalWrite(OUTPUT_PIN15, output15); //- Свет
+        step++;
     }
     
-    if (step == 10) {
-      mcp1.digitalWrite(OUTPUT_PIN12, output12); //- Свет(Хор)
+    if (step == 10 && millis() - startTime >= interval * step + shortInterval * 8) {
+        mcp1.digitalWrite(OUTPUT_PIN12, output12); //- Свет(Хор)
+        step++;
     }
     
-    if (step == 11) {
-      mcp1.digitalWrite(OUTPUT_PIN8, output8); //- Свет(кафедра)
+    if (step == 11 && millis() - startTime >= interval * step + shortInterval * 9) {
+        mcp1.digitalWrite(OUTPUT_PIN8, output8); //- Свет(кафедра)
     }
     
-    if (step == 12) {
-      mcp1.digitalWrite(OUTPUT_PIN13, output13); //- Свет(рояль)
-      Serial.println("Сценарий 1(ВЫКЛ) завершен");
+    if (step == 12 && millis() - startTime >= interval * step + shortInterval * 10) {
+        mcp1.digitalWrite(OUTPUT_PIN13, output13); //- Свет(рояль)
+        Serial.println("Сценарий 1(ВЫКЛ) завершен");
     }
   }
-  
-  if (step < 12) {
-    checkingValues();
-  }
+  checkingValues();
 }
 
 void __script2() {
+  Serial.println("__script2()");
   static unsigned long startTime = 0;
   static int step = 0;
+  unsigned long interval = 200;
+  unsigned long longInterval = 2000;
+  unsigned long shortInterval = 500;
 
   if (!script2) {
     Serial.println("Сценарий 2(ВКЛ) запущен");
-
+    startTime = millis();
+    step = 0;
     output0 = true;
     output2 = true;
     output3 = true;
@@ -610,28 +624,41 @@ void __script2() {
     output6 = true;
     output7 = true;
 
-    if (step == 0) {
+    if (step == 0 && millis() - startTime >= interval * step) {
       mcp1.digitalWrite(OUTPUT_PIN0, output0); //- Пульт
-    } else if (step == 1) {
-      mcp1.digitalWrite(OUTPUT_PIN2, output2); //- Розетки сцена
-    } else if (step == 2) {
-      mcp1.digitalWrite(OUTPUT_PIN3, output3); //- Микрофоны
-    } else if (step == 3) {
-      mcp1.digitalWrite(OUTPUT_PIN4, output4); //- Коммутация
-    } else if (step == 4) {
-      mcp1.digitalWrite(OUTPUT_PIN6, output6); //- Мониторы
-    } else if (step == 5) {
-      mcp1.digitalWrite(OUTPUT_PIN7, output7); //- Порталы
+      step++;
     }
 
-    if (step == 5 && millis() - startTime >= 2000) {
+    if (step == 1 && millis() - startTime >= interval * step) {
+      mcp1.digitalWrite(OUTPUT_PIN2, output2); //- Розетки сцена
+      step++;
+    }
+
+    if (step == 2 && millis() - startTime >= interval * step) {
+      mcp1.digitalWrite(OUTPUT_PIN3, output3); //- Микрофоны
+      step++;
+    }
+
+    if (step == 3 && millis() - startTime >= interval * step) {
+      mcp1.digitalWrite(OUTPUT_PIN4, output4); //- Коммутация
+      step++;
+    }
+
+    if (step == 4 && millis() - startTime >= interval * step + longInterval) {
+      mcp1.digitalWrite(OUTPUT_PIN6, output6); //- Мониторы
+      step++;
+    }
+
+    if (step == 5 && millis() - startTime >= interval * step + longInterval * 2) {
+      mcp1.digitalWrite(OUTPUT_PIN7, output7); //- Порталы
       Serial.println("Сценарий 2(ВКЛ) завершен");
     }
   }
 
   if (script2) {
     Serial.println("Сценарий 2(ВЫКЛ) запущен");
-
+    startTime = millis();
+    step = 0;
     output0 = false;
     output2 = false;
     output3 = false;
@@ -639,32 +666,44 @@ void __script2() {
     output6 = false;
     output7 = false;
 
-    if (step == 0) {
+    if (step == 0 && millis() - startTime >= interval * step) {
       mcp1.digitalWrite(OUTPUT_PIN6, output6); //- Мониторы
-    } else if (step == 1) {
-      mcp1.digitalWrite(OUTPUT_PIN7, output7); //- Порталы
-    } else if (step == 2) {
-      mcp1.digitalWrite(OUTPUT_PIN0, output0); //- Пульт
-    } else if (step == 3) {
-      mcp1.digitalWrite(OUTPUT_PIN2, output2); //- Розетки сцена
-    } else if (step == 4) {
-      mcp1.digitalWrite(OUTPUT_PIN3, output3); //- Микрофоны
-    } else if (step == 5) {
-      mcp1.digitalWrite(OUTPUT_PIN4, output4); //- Коммутация
+      step++;
     }
 
-    if (step == 5 && millis() - startTime >= 500) {
+    if (step == 1 && millis() - startTime >= interval * step + longInterval) {
+      mcp1.digitalWrite(OUTPUT_PIN7, output7); //- Порталы
+      step++;
+    }
+
+    if (step == 2 && millis() - startTime >= interval * step + shortInterval) {
+      mcp1.digitalWrite(OUTPUT_PIN0, output0); //- Пульт
+      step++;
+    }
+
+    if (step == 3 && millis() - startTime >= interval * step) {
+      mcp1.digitalWrite(OUTPUT_PIN2, output2); //- Розетки сцена
+      step++;
+    }
+
+    if (step == 4 && millis() - startTime >= interval * step) {
+      mcp1.digitalWrite(OUTPUT_PIN3, output3); //- Микрофоны
+      step++;
+    }
+
+    if (step == 5 && millis() - startTime >= interval * step) {
+      mcp1.digitalWrite(OUTPUT_PIN4, output4); //- Коммутация
+      step++;
+    }
+
+    if (step == 6 && millis() - startTime >= interval * step) {
       Serial.println("Сценарий 2(ВЫКЛ) завершен");
     }
   }
-
-  if (step < 5) {
-    checkingValues();
-  }
+  checkingValues();
 }
 
 void cheking(){
-  //Serial.print("1");
   btn0.tick(!mcp2.digitalRead(INPUT_PIN0));
   btn1.tick(!mcp2.digitalRead(INPUT_PIN1));
   btn2.tick(!mcp2.digitalRead(INPUT_PIN2));
@@ -804,7 +843,7 @@ void cheking(){
     Blynk.virtualWrite(V16, function0);
     Serial.print("\t Функция 0: ");
     Serial.println(!function10);
-    delay(200);
+    delay(100);
     function0 = !function0;
     mcp3.digitalWrite(OUTPUT_PIN16, function0);
     Blynk.virtualWrite(V16, function0);
@@ -829,6 +868,12 @@ void cheking(){
     Serial.println(!function2);
   }
   if (btn3.held()){
+    function3 = !function3;
+    mcp3.digitalWrite(OUTPUT_PIN19, function3);
+    Blynk.virtualWrite(V19, function3);
+    Serial.print("\t Функция 3: ");
+    Serial.println(!function3);
+    delay(100);
     function3 = !function3;
     mcp3.digitalWrite(OUTPUT_PIN19, function3);
     Blynk.virtualWrite(V19, function3);
@@ -924,10 +969,10 @@ void cheking(){
 void checkConnection() {
   if (Blynk.connected()) {
     isConnected = true;
-    mcp3.digitalWrite(OUTPUT_PIN23, LOW);
+    mcp3.digitalWrite(OUTPUT_PIN23, HIGH);
   } else {
     isConnected = false;
-    mcp3.digitalWrite(OUTPUT_PIN23, HIGH);
+    mcp3.digitalWrite(OUTPUT_PIN23, LOW);
   }
 }
 
