@@ -7,6 +7,7 @@
 #include <Ethernet.h>
 #include <BlynkSimpleEthernet.h>
 #include <GyverOS.h>
+#include <PrintToTerminalLib.h>
 
 GyverOS<2> OS;
 
@@ -26,6 +27,8 @@ IPAddress ip(192, 168, 1, 199);
 IPAddress gateway(192, 168, 1, 1);
 // Подсеть
 IPAddress subnet(255, 255, 255, 0);
+// DNS
+IPAddress dns(192,168,1,1);
 // Порт веб-сервера
 EthernetServer server(80);
 
@@ -155,6 +158,9 @@ uint32_t btnTimer = 0;
 bool script1 = false; // Сценарий1 запуск
 bool script2 = false; // Сценарий2 запуск
 
+bool chekingScripts1 = false;  // Проверка скрипта 1
+bool chekingScripts2 = false;  // Проверка скрипта 2
+
 EncButton<EB_TICK, VIRT_BTN> btn0;
 EncButton<EB_TICK, VIRT_BTN> btn1;
 EncButton<EB_TICK, VIRT_BTN> btn2;
@@ -171,6 +177,8 @@ EncButton<EB_TICK, VIRT_BTN> btn12;
 EncButton<EB_TICK, VIRT_BTN> btn13;
 EncButton<EB_TICK, VIRT_BTN> btn14;
 EncButton<EB_TICK, VIRT_BTN> btn15;
+
+WidgetTerminal terminal(V33);
 
 BLYNK_WRITE(V0)
 {
@@ -246,7 +254,7 @@ BLYNK_WRITE(V10)
 {
   output10 = param.asInt();
     mcp1.digitalWrite(OUTPUT_PIN10, output10);
-    __script2();
+    chekingScripts2 = !chekingScripts2; 
     script2 = !script2;
     Serial.print("blynk: Сценарий2 - ");
     Serial.println(output10);
@@ -255,7 +263,7 @@ BLYNK_WRITE(V11)
 {
   output11 = param.asInt();
     mcp1.digitalWrite(OUTPUT_PIN11, output11);
-    __script1();
+    chekingScripts1 = !chekingScripts1; 
     script1 = !script1;
     Serial.print("blynk: Сценарий1 - ");
     Serial.println(output11);
@@ -402,6 +410,7 @@ BLYNK_WRITE(V31)
     Serial.println(function15);
 }
 
+
 void checkingValues(){
   Serial.println("checkingValues()");
   Blynk.virtualWrite(V0, output0);
@@ -422,14 +431,16 @@ void checkingValues(){
   Blynk.virtualWrite(V15, output15);
   Serial.print("*");
 }
+
 void memoryFree(){
    int freeValue;
    if((int)__brkval == 0)
       freeValue = ((int)&freeValue) - ((int)&__bss_end);
    else
       freeValue = ((int)&freeValue) - ((int)__brkval);
-    Serial.println(freeValue);
+    Serial.println("ОЗУ:" + freeValue);
 }
+
 void __script1() {
   Serial.println("__script1()");
   static unsigned long startTime = 0;
@@ -437,7 +448,6 @@ void __script1() {
   unsigned long interval = 200;
   unsigned long longInterval = 2000;
   unsigned long shortInterval = 500;
-  
   if (!script1) {
     Serial.println("Сценарий 1(ВКЛ) запущен");
     startTime = millis();
@@ -515,6 +525,7 @@ void __script1() {
     if (step == 11 && millis() - startTime >= interval * step + shortInterval * 4) {
       mcp1.digitalWrite(OUTPUT_PIN13, output13); //- Свет(рояль)
       Serial.println("Сценарий 1(ВКЛ) завершен");
+      chekingScripts1 = !chekingScripts1; 
     }
   }
   if (script1) {
@@ -595,11 +606,13 @@ void __script1() {
     
     if (step == 11 && millis() - startTime >= interval * step + shortInterval * 9) {
         mcp1.digitalWrite(OUTPUT_PIN8, output8); //- Свет(кафедра)
+        step++;
     }
     
     if (step == 12 && millis() - startTime >= interval * step + shortInterval * 10) {
         mcp1.digitalWrite(OUTPUT_PIN13, output13); //- Свет(рояль)
         Serial.println("Сценарий 1(ВЫКЛ) завершен");
+        chekingScripts1 = !chekingScripts1; 
     }
   }
   checkingValues();
@@ -612,7 +625,6 @@ void __script2() {
   unsigned long interval = 200;
   unsigned long longInterval = 2000;
   unsigned long shortInterval = 500;
-
   if (!script2) {
     Serial.println("Сценарий 2(ВКЛ) запущен");
     startTime = millis();
@@ -627,34 +639,24 @@ void __script2() {
     if (step == 0 && millis() - startTime >= interval * step) {
       mcp1.digitalWrite(OUTPUT_PIN0, output0); //- Пульт
       step++;
-    }
-
-    if (step == 1 && millis() - startTime >= interval * step) {
+    } else if (step == 1 && millis() - startTime >= interval * step) {
       mcp1.digitalWrite(OUTPUT_PIN2, output2); //- Розетки сцена
       step++;
-    }
-
-    if (step == 2 && millis() - startTime >= interval * step) {
+    } else if (step == 2 && millis() - startTime >= interval * step) {
       mcp1.digitalWrite(OUTPUT_PIN3, output3); //- Микрофоны
       step++;
-    }
-
-    if (step == 3 && millis() - startTime >= interval * step) {
+    } else if (step == 3 && millis() - startTime >= interval * step) {
       mcp1.digitalWrite(OUTPUT_PIN4, output4); //- Коммутация
       step++;
-    }
-
-    if (step == 4 && millis() - startTime >= interval * step + longInterval) {
+    } else if (step == 4 && millis() - startTime >= interval * step + longInterval) {
       mcp1.digitalWrite(OUTPUT_PIN6, output6); //- Мониторы
       step++;
-    }
-
-    if (step == 5 && millis() - startTime >= interval * step + longInterval * 2) {
+    } else if (step == 5 && millis() - startTime >= interval * step + longInterval * 2) {
       mcp1.digitalWrite(OUTPUT_PIN7, output7); //- Порталы
       Serial.println("Сценарий 2(ВКЛ) завершен");
+      chekingScripts2 = !chekingScripts2; 
     }
   }
-
   if (script2) {
     Serial.println("Сценарий 2(ВЫКЛ) запущен");
     startTime = millis();
@@ -669,35 +671,24 @@ void __script2() {
     if (step == 0 && millis() - startTime >= interval * step) {
       mcp1.digitalWrite(OUTPUT_PIN6, output6); //- Мониторы
       step++;
-    }
-
-    if (step == 1 && millis() - startTime >= interval * step + longInterval) {
+    } else if (step == 1 && millis() - startTime >= interval * step + longInterval) {
       mcp1.digitalWrite(OUTPUT_PIN7, output7); //- Порталы
       step++;
-    }
-
-    if (step == 2 && millis() - startTime >= interval * step + shortInterval) {
+    } else if (step == 2 && millis() - startTime >= interval * step + shortInterval) {
       mcp1.digitalWrite(OUTPUT_PIN0, output0); //- Пульт
       step++;
-    }
-
-    if (step == 3 && millis() - startTime >= interval * step) {
+    } else if (step == 3 && millis() - startTime >= interval * step) {
       mcp1.digitalWrite(OUTPUT_PIN2, output2); //- Розетки сцена
       step++;
-    }
-
-    if (step == 4 && millis() - startTime >= interval * step) {
+    } else if (step == 4 && millis() - startTime >= interval * step) {
       mcp1.digitalWrite(OUTPUT_PIN3, output3); //- Микрофоны
       step++;
-    }
-
-    if (step == 5 && millis() - startTime >= interval * step) {
+    } else if (step == 5 && millis() - startTime >= interval * step) {
       mcp1.digitalWrite(OUTPUT_PIN4, output4); //- Коммутация
       step++;
-    }
-
-    if (step == 6 && millis() - startTime >= interval * step) {
+    } else if (step == 6 && millis() - startTime >= interval * step) {
       Serial.println("Сценарий 2(ВЫКЛ) завершен");
+      chekingScripts2 = !chekingScripts2;
     }
   }
   checkingValues();
@@ -796,7 +787,7 @@ void cheking(){
     Blynk.virtualWrite(V10, output10);
     Serial.println("btn: Сценарий2 - ");
     Serial.println(output10);
-    __script2();
+    chekingScripts2 = !chekingScripts2;
     script2 = !script2;
   }
   if (btn11.click()){
@@ -805,7 +796,7 @@ void cheking(){
     Blynk.virtualWrite(V11, output11);
     Serial.println("btn: Сценарий1 - ");
     Serial.println(output11);
-    __script1();
+    chekingScripts1 = !chekingScripts1;
     script1 = !script1;
   }
   if (btn12.click()){
@@ -964,6 +955,13 @@ void cheking(){
     Serial.print("\t Функция 15: ");
     Serial.println(!function15);
   }
+
+  if (chekingScripts1){
+    __script1();
+  }
+  if (chekingScripts2){
+    __script2();
+  }
 }
 
 void checkConnection() {
@@ -995,8 +993,9 @@ void handleClient(EthernetClient client) {
 void setup(){
   Serial.begin(9600);
 
-  Ethernet.begin(mac, ip, gateway, subnet);
-
+  //Ethernet.begin(mac, ip, gateway, subnet, dns);
+  Ethernet.begin(ip, gateway, subnet);
+  
   Blynk.begin(auth, domain, 9444);
 
   BBtimer.setInterval(1000, memoryFree);
@@ -1010,11 +1009,15 @@ void setup(){
   pinMode(SDCARD_CS, OUTPUT);
   digitalWrite(SDCARD_CS, HIGH);
 
-  //OS.attach(0, memoryFree, 1000);
-  //OS.attach(1, cheking, 50);
+  IPAddress deviceIP = Ethernet.localIP();
+
+  OS.attach(0, memoryFree, 1000);
+  OS.attach(1, cheking, 50);
+  OS.attach(2, checkConnection, 900);
 
   Serial.println("Start MegaPilot");
-
+  terminal.println(deviceIP);
+  
   mcp1.begin_I2C(addr1); 
   mcp2.begin_I2C(addr2); 
   mcp3.begin_I2C(addr3);
@@ -1123,8 +1126,8 @@ void setup(){
 }
 
 void loop(){
-  BBtimer.run();
-  //OS.tick();
+  //BBtimer.run();
+  OS.tick();
   Blynk.run();
 
   EthernetClient client = server.available();
