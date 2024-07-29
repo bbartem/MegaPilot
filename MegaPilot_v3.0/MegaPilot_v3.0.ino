@@ -1,6 +1,7 @@
 #include <Adafruit_MCP23X17.h>
 #include <EncButton.h>
 #include <GyverOS.h>
+#include <GyverIO.h>
 
 GyverOS<1> OS;
 
@@ -89,7 +90,7 @@ bool output5 = false;
 bool output6 = false;
 bool output7 = false;
 bool output8 = false;
-bool output9 = false;
+bool output9 = true; //false
 bool output10 = false;
 bool output11 = false;
 bool output12 = false;
@@ -297,7 +298,7 @@ void cheking(){
       output6 = true;
       output7 = true;
       output8 = true;
-      output9 = true;
+      //output9 = true;
       output13 = true;
       output14 = true;
       output15 = true;
@@ -313,8 +314,8 @@ void cheking(){
       mcp1.digitalWrite(OUTPUT_PIN3, output3); //- Микрофоны
       delay(200);
       mcp1.digitalWrite(OUTPUT_PIN4, output4); //- Коммутация
-      delay(200);
-      mcp1.digitalWrite(OUTPUT_PIN9, output9); //- Проектор
+      // delay(200);
+      // mcp1.digitalWrite(OUTPUT_PIN9, output9); //- Проектор
       delay(2000);
       mcp1.digitalWrite(OUTPUT_PIN5, output5); //- Трансляция
       delay(2000);
@@ -345,7 +346,7 @@ void cheking(){
       output6 = false;
       output7 = false;
       output8 = false;
-      output9 = false;
+      //output9 = false;
       output12 = false;
       output13 = false;
       output14 = false;
@@ -366,8 +367,8 @@ void cheking(){
       mcp1.digitalWrite(OUTPUT_PIN3, output3); //- Микрофоны
       delay(200);
       mcp1.digitalWrite(OUTPUT_PIN4, output4); //- Коммутация
-      delay(200);
-      mcp1.digitalWrite(OUTPUT_PIN9, output9); //- Проектор
+      // delay(200);
+      // mcp1.digitalWrite(OUTPUT_PIN9, output9); //- Проектор
       delay(500);
       mcp1.digitalWrite(OUTPUT_PIN14, output14); //- Свет
       mcp1.digitalWrite(OUTPUT_PIN15, output15); //- Свет
@@ -402,13 +403,13 @@ void cheking(){
     Serial.println(output14);
   }
   if (btn15.click()){
-    output15 = !output0;
+    output15 = !output15;
     mcp1.digitalWrite(OUTPUT_PIN15, output15);
     Serial.println("btn: Свет(сцена2) - ON");
     Serial.println(output15);
   }
 
-  if (btn0.held()){
+  if (btn0.hold()){
     function0 = !function0;
     mcp3.digitalWrite(OUTPUT_PIN16, function0);
     Serial.print("\t Функция 0: ");
@@ -419,7 +420,7 @@ void cheking(){
     Serial.print("\t Функция 0: ");
     Serial.println(!function10);
   }
-  if (btn1.held()){
+  if (btn1.hold()){
     function1 = !function1;
     mcp3.digitalWrite(OUTPUT_PIN17, function1);
     function7 = !function7;
@@ -427,13 +428,13 @@ void cheking(){
     Serial.print("\t Функция 1: ");
     Serial.println(!function1);
   }
-  if (btn2.held()){
+  if (btn2.hold()){
     function2 = !function2;
     mcp3.digitalWrite(OUTPUT_PIN18, function2);
     Serial.print("\t Функция 2: ");
     Serial.println(!function2);
   }
-  if (btn3.held()){
+  if (btn3.hold()){
     function3 = !function3;
     mcp3.digitalWrite(OUTPUT_PIN19, function3);
     Serial.print("\t Функция 3: ");
@@ -444,73 +445,73 @@ void cheking(){
     Serial.print("\t Функция 3: ");
     Serial.println(!function3);
   }
-  if (btn4.held()){
+  if (btn4.hold()){
     function4 = !function4;
     mcp3.digitalWrite(OUTPUT_PIN20, function4);
     Serial.print("\t Функция 4: ");
     Serial.println(!function4);
   }
-  if (btn5.held()){
+  if (btn5.hold()){
     function5 = !function5;
     mcp3.digitalWrite(OUTPUT_PIN21, function5);
     Serial.print("\t Функция 5: ");
     Serial.println(!function5);
   }
-  if (btn6.held()){
+  if (btn6.hold()){
     function6 = !function6;
     mcp3.digitalWrite(OUTPUT_PIN22, function6);
     Serial.print("\t Функция 6: ");
     Serial.println(!function6);
   }
-  if (btn7.held()){
+  if (btn7.hold()){
     function7 = !function7;
     mcp3.digitalWrite(OUTPUT_PIN23, function7);
     Serial.print("\t Функция 7: ");
     Serial.println(!function7);
   }
-  if (btn8.held()){
+  if (btn8.hold()){
     function8 = !function8;
     mcp3.digitalWrite(OUTPUT_PIN24, function8);
     Serial.print("\t Функция 8: ");
     Serial.println(!function8);
   }
-  if (btn9.held()){
+  if (btn9.hold()){
     function9 = !function9;
     mcp3.digitalWrite(OUTPUT_PIN25, function9);
     Serial.print("\t Функция 9: ");
     Serial.println(!function9);
   }
-  if (btn10.held()){
+  if (btn10.hold()){
     function10 = !function10;
     mcp3.digitalWrite(OUTPUT_PIN26, function10);
     Serial.print("\t Функция 10: ");
     Serial.println(!function10);
   }
-  if (btn11.held()){
+  if (btn11.hold()){
     function11 = !function11;
     mcp3.digitalWrite(OUTPUT_PIN27, function11);
     Serial.print("\t Функция 11: ");
     Serial.println(!function11);
   }
-  if (btn12.held()){
+  if (btn12.hold()){
     function12 = !function12;
     mcp3.digitalWrite(OUTPUT_PIN28, function12);
     Serial.print("\t Функция 12: ");
     Serial.println(!function12);
   }
-  if (btn13.held()){
+  if (btn13.hold()){
     function13 = !function13;
     mcp3.digitalWrite(OUTPUT_PIN29, function13);
     Serial.print("\t Функция 13: ");
     Serial.println(!function13);
   }
-  if (btn14.held()){
+  if (btn14.hold()){
     function14 = !function14;
     mcp3.digitalWrite(OUTPUT_PIN30, function14);
     Serial.print("\t Функция 14: ");
     Serial.println(!function4);
   }
-  if (btn15.held()){
+  if (btn15.hold()){
     function15 = !function15;
     mcp3.digitalWrite(OUTPUT_PIN31, function15);
     Serial.print("\t Функция 15: ");
@@ -524,7 +525,7 @@ void setup() {
 
   OS.attach(0, cheking, 50);
 
-  Serial.println("Start MegaPilot");
+  Serial.println("Start MegaPilot_v3.0");
 
   mcp1.begin_I2C(addr1); 
   mcp2.begin_I2C(addr2); 

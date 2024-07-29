@@ -1,15 +1,14 @@
-#define BLYNK_PRINT Serial
-#define BLYNK_DEBUG
+//#define BLYNK_PRINT Serial
+//#define BLYNK_DEBUG
 
 #include <Adafruit_MCP23X17.h>
 #include <EncButton.h>
 #include <SPI.h>
 #include <Ethernet.h>
 #include <BlynkSimpleEthernet.h>
-#include <GyverOS.h>
-#include <PrintToTerminalLib.h>
+//#include <GyverOS.h>
 
-GyverOS<2> OS;
+//GyverOS<2> OS;
 
 BlynkTimer BBtimer;
 
@@ -29,14 +28,10 @@ IPAddress gateway(192, 168, 1, 1);
 IPAddress subnet(255, 255, 255, 0);
 // DNS
 IPAddress dns(192,168,1,1);
-// Порт веб-сервера
-EthernetServer server(80);
 
-//BlynkTimer timer;
-//BlynkTimer timer2;
 
-extern int __bss_end;
-extern void *__brkval;
+//extern int __bss_end;
+//extern void *__brkval;
 
 Adafruit_MCP23X17 mcp1;
 Adafruit_MCP23X17 mcp2;
@@ -62,7 +57,7 @@ Adafruit_MCP23X17 mcp3;
 #define OUTPUT_PIN13 13
 #define OUTPUT_PIN14 14
 #define OUTPUT_PIN15 15
-
+/*
 #define OUTPUT_PIN16 0
 #define OUTPUT_PIN17 1
 #define OUTPUT_PIN18 2
@@ -79,7 +74,7 @@ Adafruit_MCP23X17 mcp3;
 #define OUTPUT_PIN29 13
 #define OUTPUT_PIN30 14
 #define OUTPUT_PIN31 15
-
+*/
 #define INPUT_PIN0 0
 #define INPUT_PIN1 1
 #define INPUT_PIN2 2
@@ -96,9 +91,6 @@ Adafruit_MCP23X17 mcp3;
 #define INPUT_PIN13 13
 #define INPUT_PIN14 14
 #define INPUT_PIN15 15
-
-#define COLOR_OFF "#8B0000"
-#define COLOR_ON "#006400"
 
 bool isConnected = false; // флаг подключения
 
@@ -135,7 +127,7 @@ bool output12 = false;
 bool output13 = false;
 bool output14 = false;
 bool output15 = false;
-
+/*
 bool function0 = true; // - 1 реле Подсобка (дверь)
 bool function1 = true; // - 3 реле Розетка
 bool function2 = true; // - 4 Реле 
@@ -152,9 +144,7 @@ bool function12 = true; // - 7 реле
 bool function13 = true; // - 5 реле
 bool function14 = true; // - 9 реле
 bool function15 = true; // - 11 реле
-
-uint32_t btnTimer = 0;
-
+*/
 bool script1 = false; // Сценарий1 запуск
 bool script2 = false; // Сценарий2 запуск
 
@@ -178,77 +168,57 @@ EncButton<EB_TICK, VIRT_BTN> btn13;
 EncButton<EB_TICK, VIRT_BTN> btn14;
 EncButton<EB_TICK, VIRT_BTN> btn15;
 
-WidgetTerminal terminal(V33);
+//WidgetTerminal terminal(33);
 
 BLYNK_WRITE(V0)
 {
   output0 = param.asInt();
   mcp1.digitalWrite(OUTPUT_PIN0, output0);
-  Serial.print("blynk: Пульт - ");
-  Serial.println(output0);
 }
 BLYNK_WRITE(V1)
 {
   output1 = param.asInt();
   mcp1.digitalWrite(OUTPUT_PIN1, output1);
-  Serial.print("blynk: Камера - ");
-  Serial.println(output1);
 }
 BLYNK_WRITE(V2)
 {
   output2 = param.asInt();
     mcp1.digitalWrite(OUTPUT_PIN2, output2);
-    Serial.print("blynk: Сцена - ");
-    Serial.println(output2);
 }
 BLYNK_WRITE(V3)
 {
   output3 = param.asInt();
     mcp1.digitalWrite(OUTPUT_PIN3, output3);
-    Serial.print("blynk: Микрофоны - ");
-    Serial.println(output3);
 }
 BLYNK_WRITE(V4)
 {
   output4 = param.asInt();
     mcp1.digitalWrite(OUTPUT_PIN4, output4);
-    Serial.print("blynk: Коммутация - ");
-    Serial.println(output4);
 }
 BLYNK_WRITE(V5)
 {
   output5 = param.asInt();
     mcp1.digitalWrite(OUTPUT_PIN5, output5);
-    Serial.print("blynk: Трансляция - ");
-    Serial.println(output5);
 }
 BLYNK_WRITE(V6)
 {
   output6 = param.asInt();
     mcp1.digitalWrite(OUTPUT_PIN6, output6);
-    Serial.print("blynk: Мониторы - ");
-    Serial.println(output6);
 }
 BLYNK_WRITE(V7)
 {
   output7 = param.asInt();
     mcp1.digitalWrite(OUTPUT_PIN7, output7);
-    Serial.print("blynk: Портал - ");
-    Serial.println(output7);
 }
 BLYNK_WRITE(V8)
 {
   output8 = param.asInt();
     mcp1.digitalWrite(OUTPUT_PIN8, output8);
-    Serial.print("blynk: Свет(кафедра) - ");
-    Serial.println(output8);
 }
 BLYNK_WRITE(V9)
 {
   output9 = param.asInt();
     mcp1.digitalWrite(OUTPUT_PIN9, output9);
-    Serial.print("blynk: Проектор - ");
-    Serial.println(output9);
 }
 BLYNK_WRITE(V10)
 {
@@ -256,8 +226,6 @@ BLYNK_WRITE(V10)
     mcp1.digitalWrite(OUTPUT_PIN10, output10);
     chekingScripts2 = !chekingScripts2; 
     script2 = !script2;
-    Serial.print("blynk: Сценарий2 - ");
-    Serial.println(output10);
 }
 BLYNK_WRITE(V11)
 {
@@ -265,154 +233,111 @@ BLYNK_WRITE(V11)
     mcp1.digitalWrite(OUTPUT_PIN11, output11);
     chekingScripts1 = !chekingScripts1; 
     script1 = !script1;
-    Serial.print("blynk: Сценарий1 - ");
-    Serial.println(output11);
 }
 BLYNK_WRITE(V12)
 {
   output12 = param.asInt();
     mcp1.digitalWrite(OUTPUT_PIN12, output12);
-    Serial.print("blynk: Свет(хор) - ");
-    Serial.println(output12);
 }
 BLYNK_WRITE(V13)
 {
   output13 = param.asInt();
     mcp1.digitalWrite(OUTPUT_PIN13, output13);
-    Serial.print("blynk: Свет(рояль) - ");
-    Serial.println(output13);
 }
 BLYNK_WRITE(V14)
 {
   output14 = param.asInt();
     mcp1.digitalWrite(OUTPUT_PIN14, output14);
-    Serial.print("blynk: Свет(сцена1) - ");
-    Serial.println(output14);
 }
 BLYNK_WRITE(V15)
 {
   output15 = param.asInt();
     mcp1.digitalWrite(OUTPUT_PIN15, output15);
-    Serial.print("blynk: Свет(сцена2) - ");
-    Serial.println(output15);
 }
-
+/*
 BLYNK_WRITE(V16)
 {
   function0 = param.asInt();
     mcp3.digitalWrite(OUTPUT_PIN16, function0);
-    Serial.print("blynk: Подсобка(дверь) - ");
-    Serial.println(function0);
 }
 BLYNK_WRITE(V17)
 {
   function1 = param.asInt();
     mcp3.digitalWrite(OUTPUT_PIN17, function1);
-    Serial.print("blynk: Розетка - ");
-    Serial.println(function1);
 }
 BLYNK_WRITE(V18)
 {
   function2 = param.asInt();
     mcp3.digitalWrite(OUTPUT_PIN18, function2);
-    Serial.print("blynk: function2 - ");
-    Serial.println(function2);
 }
 BLYNK_WRITE(V19)
 {
   function3 = param.asInt();
     mcp3.digitalWrite(OUTPUT_PIN19, function3);
-    Serial.print("blynk: Балкон(дверь) - ");
-    Serial.println(function3);
 }
 BLYNK_WRITE(V20)
 {
   function4 = param.asInt();
     mcp3.digitalWrite(OUTPUT_PIN20, function4);
-    Serial.print("blynk: function4 - ");
-    Serial.println(function4);
 }
 BLYNK_WRITE(V21)
 {
   function5 = param.asInt();
     mcp3.digitalWrite(OUTPUT_PIN21, function5);
-    Serial.print("blynk: function5 - ");
-    Serial.println(function5);
 }
 BLYNK_WRITE(V22)
 {
   function6 = param.asInt();
     mcp3.digitalWrite(OUTPUT_PIN22, function6);
-    Serial.print("blynk: function6 - ");
-    Serial.println(function6);
 }
 BLYNK_WRITE(V23)
 {
   function7 = param.asInt();
     mcp3.digitalWrite(OUTPUT_PIN23, function7);
-    Serial.print("blynk: Лампочка - ");
-    Serial.println(function7);
 }
 BLYNK_WRITE(V24)
 {
   function8 = param.asInt();
     mcp3.digitalWrite(OUTPUT_PIN24, function8);
-    Serial.print("blynk: function8 - ");
-    Serial.println(function8);
 }
 BLYNK_WRITE(V25)
 {
   function9 = param.asInt();
     mcp3.digitalWrite(OUTPUT_PIN25, function9);
-    Serial.print("blynk: function9 - ");
-    Serial.println(function9);
 }
 BLYNK_WRITE(V26)
 {
   function10 = param.asInt();
     mcp3.digitalWrite(OUTPUT_PIN26, function10);
-    Serial.print("blynk: function10 - ");
-    Serial.println(function10);
 }
 BLYNK_WRITE(V27)
 {
   function11 = param.asInt();
     mcp3.digitalWrite(OUTPUT_PIN27, function11);
-    Serial.print("blynk: function11 - ");
-    Serial.println(function11);
 }
 BLYNK_WRITE(V28)
 {
   function12 = param.asInt();
     mcp3.digitalWrite(OUTPUT_PIN28, function12);
-    Serial.print("blynk: function12 - ");
-    Serial.println(function12);
 }
 BLYNK_WRITE(V29)
 {
   function13 = param.asInt();
     mcp3.digitalWrite(OUTPUT_PIN29, function13);
-    Serial.print("blynk: function13 - ");
-    Serial.println(function13);
 }
 BLYNK_WRITE(V30)
 {
   function14 = param.asInt();
     mcp3.digitalWrite(OUTPUT_PIN30, function14);
-    Serial.print("blynk: function14 - ");
-    Serial.println(function14);
 }
 BLYNK_WRITE(V31)
 {
   function15 = param.asInt();
     mcp3.digitalWrite(OUTPUT_PIN31, function15);
-    Serial.print("blynk: function15 - ");
-    Serial.println(function15);
 }
-
+*/
 
 void checkingValues(){
-  Serial.println("checkingValues()");
   Blynk.virtualWrite(V0, output0);
   Blynk.virtualWrite(V1, output1);
   Blynk.virtualWrite(V2, output2);
@@ -429,29 +354,26 @@ void checkingValues(){
   Blynk.virtualWrite(V13, output13);
   Blynk.virtualWrite(V14, output14);
   Blynk.virtualWrite(V15, output15);
-  Serial.print("*");
 }
-
+/*
 void memoryFree(){
    int freeValue;
    if((int)__brkval == 0)
       freeValue = ((int)&freeValue) - ((int)&__bss_end);
    else
       freeValue = ((int)&freeValue) - ((int)__brkval);
-    Serial.println("ОЗУ:" + freeValue);
+    terminal.println("ОЗУ:" + freeValue);
 }
-
+*/
 void __script1() {
-  Serial.println("__script1()");
+  //terminal.println(F("__script1()"));
   static unsigned long startTime = 0;
   static int step = 0;
   unsigned long interval = 200;
   unsigned long longInterval = 2000;
   unsigned long shortInterval = 500;
   if (!script1) {
-    Serial.println("Сценарий 1(ВКЛ) запущен");
-    startTime = millis();
-    step = 0;
+    
     output0 = true;
     output1 = true;
     output2 = true;
@@ -524,12 +446,12 @@ void __script1() {
     
     if (step == 11 && millis() - startTime >= interval * step + shortInterval * 4) {
       mcp1.digitalWrite(OUTPUT_PIN13, output13); //- Свет(рояль)
-      Serial.println("Сценарий 1(ВКЛ) завершен");
-      chekingScripts1 = !chekingScripts1; 
+      chekingScripts1 = !chekingScripts1;
+      startTime = millis();
+      step = 0;
     }
   }
   if (script1) {
-    Serial.println("Сценарий 1(ВЫКЛ) запущен");
 
     startTime = millis();
     step = 0;
@@ -611,7 +533,6 @@ void __script1() {
     
     if (step == 12 && millis() - startTime >= interval * step + shortInterval * 10) {
         mcp1.digitalWrite(OUTPUT_PIN13, output13); //- Свет(рояль)
-        Serial.println("Сценарий 1(ВЫКЛ) завершен");
         chekingScripts1 = !chekingScripts1; 
     }
   }
@@ -619,14 +540,13 @@ void __script1() {
 }
 
 void __script2() {
-  Serial.println("__script2()");
+  //terminal.println("__script2()");
   static unsigned long startTime = 0;
   static int step = 0;
   unsigned long interval = 200;
   unsigned long longInterval = 2000;
   unsigned long shortInterval = 500;
   if (!script2) {
-    Serial.println("Сценарий 2(ВКЛ) запущен");
     startTime = millis();
     step = 0;
     output0 = true;
@@ -653,12 +573,10 @@ void __script2() {
       step++;
     } else if (step == 5 && millis() - startTime >= interval * step + longInterval * 2) {
       mcp1.digitalWrite(OUTPUT_PIN7, output7); //- Порталы
-      Serial.println("Сценарий 2(ВКЛ) завершен");
       chekingScripts2 = !chekingScripts2; 
     }
   }
   if (script2) {
-    Serial.println("Сценарий 2(ВЫКЛ) запущен");
     startTime = millis();
     step = 0;
     output0 = false;
@@ -687,7 +605,6 @@ void __script2() {
       mcp1.digitalWrite(OUTPUT_PIN4, output4); //- Коммутация
       step++;
     } else if (step == 6 && millis() - startTime >= interval * step) {
-      Serial.println("Сценарий 2(ВЫКЛ) завершен");
       chekingScripts2 = !chekingScripts2;
     }
   }
@@ -715,78 +632,56 @@ void cheking(){
     output0 = !output0;
     mcp1.digitalWrite(OUTPUT_PIN0, output0);
     Blynk.virtualWrite(V0, output0);
-    Serial.println("btn: Пульт - ");
-    Serial.println(output0);
   }
   if (btn1.click()){
     output1 = !output1;
     mcp1.digitalWrite(OUTPUT_PIN1, output1);
     Blynk.virtualWrite(V1, output1);
-    Serial.println("btn: Камера - ");
-    Serial.println(output1);
   }
   if (btn2.click()){
     output2 = !output2;
     mcp1.digitalWrite(OUTPUT_PIN2, output2);
     Blynk.virtualWrite(V2, output2);
-    Serial.println("btn: Сцена - ");
-    Serial.println(output2);
   }
   if (btn3.click()){
     output3 = !output3;
     mcp1.digitalWrite(OUTPUT_PIN3, output3);
     Blynk.virtualWrite(V3, output3);
-    Serial.println("btn: Микрофоны - ");
-    Serial.println(output3);
   }
   if (btn4.click()){
     output4 = !output4;
     mcp1.digitalWrite(OUTPUT_PIN4, output4);
     Blynk.virtualWrite(V4, output4);
-    Serial.println("btn: Коммутация - ");
-    Serial.println(output4);
   }
   if (btn5.click()){
     output5 = !output5;
     mcp1.digitalWrite(OUTPUT_PIN5, output5);
     Blynk.virtualWrite(V5, output5);
-    Serial.println("btn: Трансляция - ");
-    Serial.println(output5);
   }
   if (btn6.click()){
     output6 = !output6;
     mcp1.digitalWrite(OUTPUT_PIN6, output6);
     Blynk.virtualWrite(V6, output6);
-    Serial.println("btn: Мониторы - ");
-    Serial.println(output6);
   }
   if (btn7.click()){
     output7 = !output7;
     mcp1.digitalWrite(OUTPUT_PIN7, output7);
     Blynk.virtualWrite(V7, output7);
-    Serial.println("btn: Портал - ");
-    Serial.println(output7);
   }
   if (btn8.click()){
     output8 = !output8;
     mcp1.digitalWrite(OUTPUT_PIN8, output8);
     Blynk.virtualWrite(V8, output8);
-    Serial.println("btn: Свет(кафедра) - ");
-    Serial.println(output8);
   }
   if (btn9.click()){
     output9 = !output9;
     mcp1.digitalWrite(OUTPUT_PIN9, output9);
     Blynk.virtualWrite(V9, output9);
-    Serial.println("btn: Проектор - ");
-    Serial.println(output9);
   }
   if (btn10.click()){
     output10 = !output10;
     mcp1.digitalWrite(OUTPUT_PIN10, output10);
     Blynk.virtualWrite(V10, output10);
-    Serial.println("btn: Сценарий2 - ");
-    Serial.println(output10);
     chekingScripts2 = !chekingScripts2;
     script2 = !script2;
   }
@@ -794,8 +689,6 @@ void cheking(){
     output11 = !output11;
     mcp1.digitalWrite(OUTPUT_PIN11, output11);
     Blynk.virtualWrite(V11, output11);
-    Serial.println("btn: Сценарий1 - ");
-    Serial.println(output11);
     chekingScripts1 = !chekingScripts1;
     script1 = !script1;
   }
@@ -803,43 +696,31 @@ void cheking(){
     output12 = !output12;
     mcp1.digitalWrite(OUTPUT_PIN12, output12);
     Blynk.virtualWrite(V12, output12);
-    Serial.println("btn: Свет(хор) - ");
-    Serial.println(output12);
   }
   if (btn13.click()){
     output13 = !output13;
     mcp1.digitalWrite(OUTPUT_PIN13, output13);
     Blynk.virtualWrite(V13, output13);
-    Serial.println("btn: Свет(рояль) - ");
-    Serial.println(output13);
   }
   if (btn14.click()){
     output14 = !output14;
     mcp1.digitalWrite(OUTPUT_PIN14, output14);
     Blynk.virtualWrite(V14, output14);
-    Serial.println("btn: Свет(сцена1) - ");
-    Serial.println(output14);
   }
   if (btn15.click()){
     output15 = !output14;
     mcp1.digitalWrite(OUTPUT_PIN15, output15);
     Blynk.virtualWrite(V15, output15);
-    Serial.println("btn: Свет(сцена2) - ");
-    Serial.println(output15);
   }
-
+/*
   if (btn0.held()){
     function0 = !function0;
     mcp3.digitalWrite(OUTPUT_PIN16, function0);
     Blynk.virtualWrite(V16, function0);
-    Serial.print("\t Функция 0: ");
-    Serial.println(!function10);
     delay(100);
     function0 = !function0;
     mcp3.digitalWrite(OUTPUT_PIN16, function0);
     Blynk.virtualWrite(V16, function0);
-    Serial.print("\t Функция 0: ");
-    Serial.println(!function10);
   }
   if (btn1.held()){
     function1 = !function1;
@@ -848,114 +729,82 @@ void cheking(){
     function7 = !function7;
     mcp3.digitalWrite(OUTPUT_PIN23, function7);
     Blynk.virtualWrite(V23, function7);
-    Serial.print("\t Функция 1: ");
-    Serial.println(!function1);
   }
   if (btn2.held()){
     function2 = !function2;
     mcp3.digitalWrite(OUTPUT_PIN18, function2);
     Blynk.virtualWrite(V18, function2);
-    Serial.print("\t Функция 2: ");
-    Serial.println(!function2);
   }
   if (btn3.held()){
     function3 = !function3;
     mcp3.digitalWrite(OUTPUT_PIN19, function3);
     Blynk.virtualWrite(V19, function3);
-    Serial.print("\t Функция 3: ");
-    Serial.println(!function3);
     delay(100);
     function3 = !function3;
     mcp3.digitalWrite(OUTPUT_PIN19, function3);
     Blynk.virtualWrite(V19, function3);
-    Serial.print("\t Функция 3: ");
-    Serial.println(!function3);
   }
   if (btn4.held()){
     function4 = !function4;
     mcp3.digitalWrite(OUTPUT_PIN20, function4);
     Blynk.virtualWrite(V20, function4);
-    Serial.print("\t Функция 4: ");
-    Serial.println(!function4);
   }
   if (btn5.held()){
     function5 = !function5;
     mcp3.digitalWrite(OUTPUT_PIN21, function5);
     Blynk.virtualWrite(V21, function5);
-    Serial.print("\t Функция 5: ");
-    Serial.println(!function5);
   }
   if (btn6.held()){
     function6 = !function6;
     mcp3.digitalWrite(OUTPUT_PIN22, function6);
     Blynk.virtualWrite(V22, function6);
-    Serial.print("\t Функция 6: ");
-    Serial.println(!function6);
   }
   if (btn7.held()){
     function7 = !function7;
     mcp3.digitalWrite(OUTPUT_PIN23, function7);
     Blynk.virtualWrite(V23, function7);
-    Serial.print("\t Функция 7: ");
-    Serial.println(!function7);
   }
   if (btn8.held()){
     function8 = !function8;
     mcp3.digitalWrite(OUTPUT_PIN24, function8);
     Blynk.virtualWrite(V24, function8);
-    Serial.print("\t Функция 8: ");
-    Serial.println(!function8);
   }
   if (btn9.held()){
     function9 = !function9;
     mcp3.digitalWrite(OUTPUT_PIN25, function9);
     Blynk.virtualWrite(V25, function9);
-    Serial.print("\t Функция 9: ");
-    Serial.println(!function9);
   }
   if (btn10.held()){
     function10 = !function10;
     mcp3.digitalWrite(OUTPUT_PIN26, function10);
     Blynk.virtualWrite(V26, function10);
-    Serial.print("\t Функция 10: ");
-    Serial.println(!function10);
   }
   if (btn11.held()){
     function11 = !function11;
     mcp3.digitalWrite(OUTPUT_PIN27, function11);
     Blynk.virtualWrite(V27, function11);
-    Serial.print("\t Функция 11: ");
-    Serial.println(!function11);
   }
   if (btn12.held()){
     function12 = !function12;
     mcp3.digitalWrite(OUTPUT_PIN28, function12);
     Blynk.virtualWrite(V28, function12);
-    Serial.print("\t Функция 12: ");
-    Serial.println(!function12);
   }
   if (btn13.held()){
     function13 = !function13;
     mcp3.digitalWrite(OUTPUT_PIN29, function13);
     Blynk.virtualWrite(V29, function13);
-    Serial.print("\t Функция 13: ");
-    Serial.println(!function13);
   }
   if (btn14.held()){
     function14 = !function14;
     mcp3.digitalWrite(OUTPUT_PIN30, function14);
-    Blynk.virtualWrite(V30, function14);    
-    Serial.print("\t Функция 14: ");
-    Serial.println(!function4);
+    Blynk.virtualWrite(V30, function14);
   }
   if (btn15.held()){
     function15 = !function15;
     mcp3.digitalWrite(OUTPUT_PIN31, function15);
     Blynk.virtualWrite(V31, function15);
-    Serial.print("\t Функция 15: ");
-    Serial.println(!function15);
   }
-
+*/
   if (chekingScripts1){
     __script1();
   }
@@ -963,7 +812,7 @@ void cheking(){
     __script2();
   }
 }
-
+/*
 void checkConnection() {
   if (Blynk.connected()) {
     isConnected = true;
@@ -973,54 +822,35 @@ void checkConnection() {
     mcp3.digitalWrite(OUTPUT_PIN23, LOW);
   }
 }
-
-void handleClient(EthernetClient client) {
-  if (client.connected()) {
-    client.println("HTTP/1.1 200 OK");
-    client.println("Content-Type: text/html");
-    client.println();
-
-    client.println("<html><body>");
-    client.println("<h1>MegaPilot</h1>");
-    client.println("<p>MegaPilot_v2.2.3</p>");
-    client.println("<p>https://github.com/bbartem/MegaPilot.git</p>");
-    client.println("</body></html>");
-
-    client.stop();
-  }
-}
-
+*/
 void setup(){
   Serial.begin(9600);
-
-  //Ethernet.begin(mac, ip, gateway, subnet, dns);
-  Ethernet.begin(ip, gateway, subnet);
+  
+  //Ethernet.begin(ip, gateway, subnet);
+  Ethernet.begin(mac, ip, dns, gateway, subnet);
+  SPI.begin();
   
   Blynk.begin(auth, domain, 9444);
 
-  BBtimer.setInterval(1000, memoryFree);
-  BBtimer.setInterval(900, checkConnection);
+  //BBtimer.setInterval(1000, memoryFree);
+  //BBtimer.setInterval(900, checkConnection);
   BBtimer.setInterval(50, cheking);
-
-  server.begin();
-
-  SPI.begin();
-
+  
   pinMode(SDCARD_CS, OUTPUT);
   digitalWrite(SDCARD_CS, HIGH);
 
   IPAddress deviceIP = Ethernet.localIP();
 
-  OS.attach(0, memoryFree, 1000);
-  OS.attach(1, cheking, 50);
-  OS.attach(2, checkConnection, 900);
+  //OS.attach(0, memoryFree, 1000);
+  //OS.attach(1, cheking, 50);
+  //OS.attach(2, checkConnection, 900);
 
-  Serial.println("Start MegaPilot");
-  terminal.println(deviceIP);
+  //Serial.println(F("Start MegaPilot"));
+  Serial.println(deviceIP);
   
   mcp1.begin_I2C(addr1); 
   mcp2.begin_I2C(addr2); 
-  mcp3.begin_I2C(addr3);
+  //mcp3.begin_I2C(addr3);
 
   mcp1.pinMode(OUTPUT_PIN0, OUTPUT);
   mcp1.pinMode(OUTPUT_PIN1, OUTPUT);
@@ -1038,7 +868,7 @@ void setup(){
   mcp1.pinMode(OUTPUT_PIN13, OUTPUT);
   mcp1.pinMode(OUTPUT_PIN14, OUTPUT);
   mcp1.pinMode(OUTPUT_PIN15, OUTPUT);
-  
+  /*
   mcp3.pinMode(OUTPUT_PIN16, OUTPUT);
   mcp3.pinMode(OUTPUT_PIN17, OUTPUT);
   mcp3.pinMode(OUTPUT_PIN18, OUTPUT);
@@ -1055,7 +885,7 @@ void setup(){
   mcp3.pinMode(OUTPUT_PIN29, OUTPUT);
   mcp3.pinMode(OUTPUT_PIN30, OUTPUT);
   mcp3.pinMode(OUTPUT_PIN31, OUTPUT);
-
+*/
   mcp2.pinMode(INPUT_PIN0, INPUT_PULLUP);
   mcp2.pinMode(INPUT_PIN1, INPUT_PULLUP);
   mcp2.pinMode(INPUT_PIN2, INPUT_PULLUP);
@@ -1106,7 +936,7 @@ void setup(){
   mcp2.digitalWrite(INPUT_PIN13, button13);
   mcp2.digitalWrite(INPUT_PIN14, button14);
   mcp2.digitalWrite(INPUT_PIN15, button15);
-
+/*
   mcp3.digitalWrite(OUTPUT_PIN16, function0); // 
   mcp3.digitalWrite(OUTPUT_PIN17, function1); //
   mcp3.digitalWrite(OUTPUT_PIN18, function2); // 
@@ -1123,15 +953,11 @@ void setup(){
   mcp3.digitalWrite(OUTPUT_PIN29, function13); //
   mcp3.digitalWrite(OUTPUT_PIN30, function14); //
   mcp3.digitalWrite(OUTPUT_PIN31, function15); //
+  */
 }
 
 void loop(){
-  //BBtimer.run();
-  OS.tick();
+  BBtimer.run();
+  //OS.tick();
   Blynk.run();
-
-  EthernetClient client = server.available();
-  if (client) {
-    handleClient(client);
-  }
 }
