@@ -2,10 +2,7 @@
 #include <EncButton.h>
 #include <GyverOS.h>
 #include <GyverIO.h>
-#include <Ethernet.h>
-#include <PubSubClient.h>
 
-GyverOS<1> OS;
 
 Adafruit_MCP23X17 mcp1;
 Adafruit_MCP23X17 mcp2;
@@ -19,67 +16,77 @@ const uint8_t OUTPUT_PINS1[] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14
 const uint8_t OUTPUT_PINS3[] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15};
 const uint8_t INPUT_PINS[] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15};
 
+const uint8_t scenario1ON[] = {0, 1, 2, 3, 4, 5, 6, 7, 14, 15, 8, 13};
+const uint8_t scenario2ON[] = {0, 2, 3, 4, 6, 7};
+const uint8_t scenarioOFF[] = {5, 6, 7, 0, 1, 2, 3, 4, 14, 15, 12, 13, 8};
+
 int indicesScenario1ON[] = {0, 1, 2, 3, 4, 5, 6, 7, 14, 15, 8, 13}; // Сценарий включения Скрипта1
 int indicesScenario2ON[] = {0, 2, 3, 4, 6, 7}; // Сценарий включения Скрипта2
 int indicesScenarioOFF[] = {5, 6, 7, 0, 1, 2, 3, 4, 14, 15, 12, 13, 8}; // Сценарий выключения всего
 
-int numElementsScenario1ON = sizeof(indicesScenario1ON) / sizeof(indicesScenario1ON[0]);
-int numElementsScenario2ON = sizeof(indicesScenario2ON) / sizeof(indicesScenario2ON[0]);
-int numElementsScenarioOFF = sizeof(indicesScenarioOFF) / sizeof(indicesScenarioOFF[0]);
-
-bool buttonState[16] = {0};
-bool outputState[16] = {0};
-bool relayState[16] = {1};
+bool buttonState[16];
+bool outputState[16];
+bool functionState[16];
 
 bool script1 = false;
 bool script2 = false;
 
 bool checkScriptLed = true;
 
-Button btns[16];  // Массив кнопок
+VirtButton btns[16];  // Массив кнопок
 
-// Network settings
-byte mac[] = { 0xDE, 0xAD, 0xBE, 0xEF, 0xFE, 0xED };
-IPAddress ip(192, 168, 1, 12);
-IPAddress server(192, 168, 1, 40);
+unsigned long previousMillis = 0; // Переменная для хранения времени
+const unsigned long intervalHold0 = 100; // Интервал в миллисекундах (100 мс)
+const unsigned long intervalClick = 500; // Интервал в миллисекундах (500 мс)
 
-EthernetClient ethClient;
-PubSubClient client(ethClient);
+unsigned long blinkStartTime = 0;
+int remainingBlinks = 0;
+bool isBlinking = false;
+bool ledState = true;
+unsigned long blinkInterval = 200; // Интервал мигания в миллисекундах
 
-// Callback function for MQTT
-void callback(char* topic, byte* payload, unsigned int length) {
-  // Convert payload to a string
-  String message;
-  for (unsigned int i = 0; i < length; i++) {
-    message += (char)payload[i];
-  }
-  
-  // Parse the topic and payload
-  if (String(topic) == "home/relay") {
-    int relay = message.toInt();
-    outputState[relay] = !outputState[relay];
-    mcp1.digitalWrite(OUTPUT_PINS1[relay], outputState[relay]);
-  }
+void printAllValues() {
+  Serial.println("buttonState:");
+  printArray(buttonState, 16);
+
+  Serial.println("outputState:");
+  printArray(outputState, 16);
+
+  Serial.println("functionState:");
+  printArray(functionState, 16);
 }
 
-bool reconnect(int attempts) {
-  int attempt = 0;
-  while (!client.connected() && attempt < attempts) {
-    Serial.print("Attempting MQTT connection...");
-    if (client.connect("ArduinoClient")) {
-      Serial.println("connected");
-      client.publish("home/status", "Arduino connected");
-      client.subscribe("home/relay");
-      return true;
-    } else {
-      Serial.print("failed, rc=");
-      Serial.print(client.state());
-      Serial.println(" try again in 5 seconds");
-      delay(5000);
-      attempt++;
-    }
+template<typename T>
+void printArray(const T* arr, size_t size) {
+  for (size_t i = 0; i < size; i++) {
+    Serial.print(arr[i]);
+    Serial.print(" ");
   }
-  return false;
+  Serial.println();
+}
+
+void sequentialToggle(const int* indices, int size, bool state, const uint8_t* outputPins) {
+  checkScript();
+  for (int i = 0; i < size; i++) {
+    uint8_t pinIndex = indices[i];
+    
+    for (int j = 0; j < 16; j++) {
+      if (OUTPUT_PINS1[j] == pinIndex) {
+        outputState[j] = state;
+        break;
+      }
+    }
+
+    mcp1.digitalWrite(outputPins[i], state);
+    Serial.print("Pin ");
+    Serial.print(pinIndex);
+    Serial.print(" ");
+    Serial.print(state ? "ON" : "OFF");
+    Serial.println();
+
+    previousMillis = millis(); 
+    while (millis() - previousMillis < intervalClick) { }
+  }
 }
 
 void checkScript() {
@@ -89,150 +96,127 @@ void checkScript() {
   Serial.println(!checkScriptLed);
 }
 
-void updateOutputs(const uint8_t* pins, Adafruit_MCP23X17 &mcp, bool* stateArray) {
-  for (int i = 0; i < 16; ++i) {
-    mcp.digitalWrite(pins[i], stateArray[i]);
-  }
+void blinkLamp(int blinkCount) {
+  remainingBlinks = blinkCount * 2;
+  isBlinking = true;
+  blinkStartTime = millis();
 }
-void blinkLed(uint8_t times) {
-  static uint32_t lastBlinkTime = 0;
-  static uint8_t blinkCount = 0;
-  static bool ledState = false;
 
-  if (times == 0) return; // Нечего делать
-
-  if (millis() - lastBlinkTime >= 500) { // 500 мс интервал
-    lastBlinkTime = millis();
-    ledState = !ledState;
-    mcp3.digitalWrite(OUTPUT_PINS3[7], ledState);
-
-    if (ledState == false) {
-      blinkCount++;
-      if (blinkCount >= times * 2) { // Учитываем включение и выключение
-        blinkCount = 0;
-        return; // Завершение мигания
-      }
-    }
+void updateOutputs1(const uint8_t* pins, bool* stateArray) {
+  for (int i = 0; i < 16; i++) {
+    mcp1.digitalWrite(pins[i], stateArray[i]);
+    Serial.println("Инициализация_1 - Реле:");
+    Serial.println(i);
   }
 }
 
-void checkButtons() {
-  for (int i = 0; i < 16; ++i) {
-    btns[i].tick();
+void updateOutputs2(const uint8_t* pins, bool* stateArray) {
+  for (int i = 0; i < 16; i++) {
+    mcp3.digitalWrite(pins[i], stateArray[i]);
+    Serial.println("Инициализация_2 - Реле:");
+    Serial.println(i);
   }
-  // Обработка на клик
-  for (int i = 0; i < 16; ++i) {
-    if (btns[i].click()) {
-      outputState[i] = !outputState[i];
-      mcp1.digitalWrite(OUTPUT_PINS1[i], outputState[i]);
-      Serial.print("btns: ");
-      Serial.print(i);
-      Serial.print(" - ");
-      Serial.println(outputState[i]);
-    }
-  }
- // Дверь подсобка
-  if (btns[0].hold()) {
-    relayState[0] = !relayState[0];
-    mcp3.digitalWrite(OUTPUT_PINS3[0], relayState[0]);
-    Serial.print("\t Function ");
-    Serial.print(0);
-    Serial.print(": ");
-    Serial.println(!relayState[0]);
-    delay(100);
-    relayState[0] = !relayState[0];
-    mcp3.digitalWrite(OUTPUT_PINS3[0], relayState[0]);
-    Serial.print("\t Function ");
-    Serial.print(0);
-    Serial.print(": ");
-    Serial.println(!relayState[0]);
-    blinkLed(1);
-  }
- // Пульт2
-  if (btns[1].hold()) {
-    relayState[1] = !relayState[1];
-    mcp3.digitalWrite(OUTPUT_PINS3[1], relayState[1]);
-    Serial.print("\t Function ");
-    Serial.print(1);
-    Serial.print(": ");
-    Serial.println(!relayState[1]);
-    blinkLed(2);
-  }
-  
-// Сценарий 2
-  if (btns[10].click()) {
-    script2 = !script2;
-    Serial.print("btns: Scenario 2 - ");
-    Serial.println(script2 ? "ON" : "OFF");
-    if (script2) {
-      Serial.println("Scenario 2 (ON) started");
-      checkScript();
-      for (int i = 0; i < numElementsScenario2ON; ++i) {
-        int index = indicesScenario2ON[i]; // Получаем текущий индекс
-        outputState[index] = 1; // Изменяем значение на 1
-        Serial.print("OUTPUT_PIN[");
-        Serial.print(index);
-        Serial.println("] = 1");
-        delay(500);
-      }
-      Serial.println("Scenario 2 (ON) finished");
-      checkScript();
-    } else {
-      Serial.println("Scenario 2 (OFF) started");
-      checkScript();
-      for (int i = 0; i < numElementsScenarioOFF; ++i) {
-        int index = indicesScenarioOFF[i]; // Получаем текущий индекс
-        outputState[index] = 0; // Изменяем значение на 0
-        Serial.print("OUTPUT_PIN[");
-        Serial.print(index);
-        Serial.println("] = 0");
-        delay(500);
-      }
-      Serial.println("Scenario 2 (OFF) finished");
-      checkScript();
-    }
-  }
-// Сценарий 1
-  if (btns[11].click()) {
-    script1 = !script1;
-    Serial.print("btns: Scenario 1 - ");
-    Serial.println(script1 ? "ON" : "OFF");
+}
 
-    if (script1) {
-      Serial.println("Scenario 1 (ON) started");
-      checkScript();
-      for (int i = 0; i < numElementsScenario1ON; ++i) {
-        int index = indicesScenario1ON[i]; // Получаем текущий индекс
-        outputState[index] = 1; // Изменяем значение на 1
-        Serial.print("OUTPUT_PIN[");
-        Serial.print(index);
-        Serial.println("] = 1");
-        delay(500);
+// Обработка на клик
+void btnsClick(int i) {
+    if (i != 10 && i != 11) {
+      if (btns[i].click()) {
+        outputState[i] = !outputState[i];
+        mcp1.digitalWrite(OUTPUT_PINS1[i], outputState[i]);
+        Serial.print("btn: ");
+        Serial.print(i);
+        Serial.print(" - ");
+        Serial.println(outputState[i]);
       }
-      Serial.println("Scenario 1 (ON) finished");
-      checkScript();
-    } else {
-      Serial.println("Scenario 1 (OFF) started");
-      checkScript();
-      for (int i = 0; i < numElementsScenarioOFF; ++i) {
-        int index = indicesScenarioOFF[i]; // Получаем текущий индекс
-        outputState[index] = 0; // Изменяем значение на 0
-        Serial.print("OUTPUT_PIN[");
-        Serial.print(index);
-        Serial.println("] = 0");
-        delay(500);
+    }
+}
+
+void btns0Hold() {
+    if (btns[0].hold()) {
+      blinkLamp(1);
+      functionState[0] = !functionState[0];
+      mcp3.digitalWrite(OUTPUT_PINS3[0], functionState[0]);
+      Serial.print("\t Function ");
+      Serial.print(0);
+      Serial.print(": ");
+      Serial.println(!functionState[0]);
+      btns[0].clear();
+      delay(100);
+      functionState[0] = !functionState[0];
+      mcp3.digitalWrite(OUTPUT_PINS3[0], functionState[0]);
+      Serial.print("\t Function ");
+      Serial.print(0);
+      Serial.print(": ");
+      Serial.println(!functionState[0]);
+    }
+}
+
+void btns1Hold() {
+    if (btns[1].hold()) {
+      blinkLamp(2);
+      btns[1].clear();
+      functionState[1] = !functionState[1];
+      mcp3.digitalWrite(OUTPUT_PINS3[1], functionState[1]);
+      Serial.print("\t Function ");
+      Serial.print(1);
+      Serial.print(": ");
+      Serial.println(!functionState[1]);
+    }
+}
+
+void btns10Hold() {
+    if (btns[10].hold()) {
+      outputState[10] = !outputState[10];
+      mcp1.digitalWrite(OUTPUT_PINS1[10], outputState[10]);
+      Serial.print("btn: Scenario 2 - ");
+      Serial.println(script2 ? "OFF" : "ON");
+      if (!script2) {
+        Serial.println("Scenario 2 (ON) started");
+        sequentialToggle(indicesScenario2ON, sizeof(indicesScenario2ON) / sizeof(indicesScenario2ON[0]), 1, scenario2ON);
+        script1 = !script1;
+        Serial.println("Scenario 2 (ON) finished");
+      } 
+      if (script2) {
+        Serial.println("Scenario 2 (OFF) started");
+        sequentialToggle(indicesScenarioOFF, sizeof(indicesScenarioOFF) / sizeof(indicesScenarioOFF[0]), 0, scenarioOFF);
+        script1 = !script1;
+        Serial.println("Scenario 2 (OFF) finished");
       }
-      Serial.println("Scenario 1 (OFF) finished");
+      script2 = !script2;
+      btns[10].clear();
+      delay(500);
       checkScript();
     }
-  }
+}
+
+void btns11Hold() {
+    if (btns[11].hold()) {
+      outputState[11] = !outputState[11];
+      mcp1.digitalWrite(OUTPUT_PINS1[11], outputState[11]);
+      Serial.print("btn: Scenario 1 - ");
+      Serial.println(script1 ? "OFF" : "ON");
+      if (!script1) {
+        Serial.println("Scenario 1 (ON) started");
+        sequentialToggle(indicesScenario1ON, sizeof(indicesScenario1ON) / sizeof(indicesScenario1ON[0]), 1, scenario1ON);
+        script2 = !script2;
+        Serial.println("Scenario 1 (ON) finished");
+      } 
+      if (script1) {
+        Serial.println("Scenario 1 (OFF) started");
+        sequentialToggle(indicesScenarioOFF, sizeof(indicesScenarioOFF) / sizeof(indicesScenarioOFF[0]), 0, scenarioOFF);
+        script2 = !script2;
+        Serial.println("Scenario 1 (OFF) finished");
+      }
+      script1 = !script1;
+      btns[11].clear();
+      delay(500);
+      checkScript();
+    }
 }
 
 void setup() {
   Serial.begin(9600);
-  OS.attach(0, checkButtons, 50);
-  Serial.println("Start MegaPilot_v5.1");
-
   mcp1.begin_I2C(addr1); 
   mcp2.begin_I2C(addr2); 
   mcp3.begin_I2C(addr3);
@@ -241,31 +225,47 @@ void setup() {
   for (uint8_t pin : OUTPUT_PINS3) mcp3.pinMode(pin, OUTPUT);
   for (uint8_t pin : INPUT_PINS) mcp2.pinMode(pin, INPUT_PULLUP);
 
-  updateOutputs(OUTPUT_PINS1, mcp1, outputState);
-  updateOutputs(OUTPUT_PINS3, mcp3, relayState);
-
-  // Инициализация кнопок
-  for (int i = 0; i < 16; ++i) {
-    btns[i].init(INPUT_PINS[i]);
-  }
+  for (int i = 0; i < 16; i++) { buttonState[i] = 0; }
+  for (int i = 0; i < 16; i++) { functionState[i] = 1; }
+  for (int i = 0; i < 16; i++) { outputState[i] = 0; }
 
   outputState[9] = 1; // Экран 
 
-  blinkLed(5);
+  updateOutputs1(OUTPUT_PINS1, outputState);
+  updateOutputs2(OUTPUT_PINS3, functionState);
 
-  Ethernet.begin(mac, ip);
-  client.setServer(server, 1883);
-  client.setCallback(callback);
-
-  if (!reconnect(3)) {
-    Serial.println("MQTT connection failed, running in standalone mode.");
-    blinkLed(15);
+  // Инициализация кнопок
+  for (int i = 0; i < 16; i++) { 
+    btns[i].tick(!mcp2.digitalRead(INPUT_PINS[i]));
   }
+
+  Serial.println("Start MegaPilot_v5.0");
+  blinkLamp(5);
+  printAllValues();
 }
 
 void loop() {
-  OS.tick();
-  if (client.connected()) {
-    client.loop();
+  for (int i = 0; i < 16; i++) {
+    btns[i].tick(!mcp2.digitalRead(INPUT_PINS[i]));
+
+    btnsClick(i);
+    btns0Hold();
+    btns1Hold();
+    btns10Hold();
+    btns11Hold();
+
+    if (isBlinking && remainingBlinks > 0) {
+      if (millis() - blinkStartTime >= blinkInterval) {
+        blinkStartTime = millis();
+        ledState = !ledState;
+        mcp3.digitalWrite(OUTPUT_PINS3[7], ledState);
+        remainingBlinks--;
+        if (remainingBlinks == 0) {
+          isBlinking = false;
+          mcp3.digitalWrite(OUTPUT_PINS3[7], HIGH);
+        }
+      }
+    }
   }
+  delay(20);
 }
