@@ -88,6 +88,7 @@ void sequentialToggle(const int* indices, int size, bool state, const uint8_t* o
     previousMillis = millis(); 
     while (millis() - previousMillis < intervalClick) { }
   }
+  checkScript();
 }
 
 
@@ -134,7 +135,7 @@ void setup() {
   for (int i = 0; i < 16; i++) { functionState[i] = 1; }
   for (int i = 0; i < 16; i++) { outputState[i] = 0; }
 
-  outputState[9] = 1; // Экран 
+  outputState[9] = 0; // Экран 
 
   updateOutputs1(OUTPUT_PINS1, outputState);
   updateOutputs2(OUTPUT_PINS3, functionState);
@@ -152,7 +153,6 @@ void setup() {
 void loop() {
   for (int i = 0; i < 16; i++) {
     btns[i].tick(!mcp2.digitalRead(INPUT_PINS[i]));
-    
     if (i != 10 && i != 11) {
       // Обработка на клик
       if (btns[i].click()) {
@@ -164,91 +164,44 @@ void loop() {
         Serial.println(outputState[i]);
       }
     }
-    // Обработка на удержание
-    if (btns[0].hold()) {
-      blinkLamp(1);
-      functionState[0] = !functionState[0];
-      mcp3.digitalWrite(OUTPUT_PINS3[0], functionState[0]);
-      Serial.print("\t Function ");
-      Serial.print(0);
-      Serial.print(": ");
-      Serial.println(!functionState[0]);
-      btns[0].clear();
-      delay(100);
-      functionState[0] = !functionState[0];
-      mcp3.digitalWrite(OUTPUT_PINS3[0], functionState[0]);
-      Serial.print("\t Function ");
-      Serial.print(0);
-      Serial.print(": ");
-      Serial.println(!functionState[0]);
-    }
-    if (btns[1].hold()) {
-      blinkLamp(2);
-      btns[1].clear();
-      functionState[1] = !functionState[1];
-      mcp3.digitalWrite(OUTPUT_PINS3[1], functionState[1]);
-      Serial.print("\t Function ");
-      Serial.print(1);
-      Serial.print(": ");
-      Serial.println(!functionState[1]);
-    }
-    if (btns[10].hold()) {
-      outputState[10] = !outputState[10];
-      mcp1.digitalWrite(OUTPUT_PINS1[10], outputState[10]);
-      Serial.print("btn: Scenario 2 - ");
-      Serial.println(script2 ? "OFF" : "ON");
-      if (!script2) {
-        Serial.println("Scenario 2 (ON) started");
-        sequentialToggle(indicesScenario2ON, sizeof(indicesScenario2ON) / sizeof(indicesScenario2ON[0]), 1, scenario2ON);
-        script1 = !script1;
-        Serial.println("Scenario 2 (ON) finished");
-      } 
-      if (script2) {
-        Serial.println("Scenario 2 (OFF) started");
-        sequentialToggle(indicesScenarioOFF, sizeof(indicesScenarioOFF) / sizeof(indicesScenarioOFF[0]), 0, scenarioOFF);
-        script1 = !script1;
-        Serial.println("Scenario 2 (OFF) finished");
-      }
-      script2 = !script2;
-      btns[10].clear();
-      delay(500);
-      checkScript();
-    }
-    if (btns[11].hold()) {
-      outputState[11] = !outputState[11];
-      mcp1.digitalWrite(OUTPUT_PINS1[11], outputState[11]);
-      Serial.print("btn: Scenario 1 - ");
-      Serial.println(script1 ? "OFF" : "ON");
-      if (!script1) {
-        Serial.println("Scenario 1 (ON) started");
-        sequentialToggle(indicesScenario1ON, sizeof(indicesScenario1ON) / sizeof(indicesScenario1ON[0]), 1, scenario1ON);
-        script2 = !script2;
-        Serial.println("Scenario 1 (ON) finished");
-      } 
-      if (script1) {
-        Serial.println("Scenario 1 (OFF) started");
-        sequentialToggle(indicesScenarioOFF, sizeof(indicesScenarioOFF) / sizeof(indicesScenarioOFF[0]), 0, scenarioOFF);
-        script2 = !script2;
-        Serial.println("Scenario 1 (OFF) finished");
-      }
-      script1 = !script1;
-      btns[11].clear();
-      delay(500);
-      checkScript();
-    }
-    if (isBlinking && remainingBlinks > 0) {
-      if (millis() - blinkStartTime >= blinkInterval) {
-        blinkStartTime = millis();
-        ledState = !ledState;
-        mcp3.digitalWrite(OUTPUT_PINS3[7], ledState);
-        remainingBlinks--;
+  }
+  handleScenarioButton(10, scenario2ON, indicesScenario2ON, script2);
+  handleScenarioButton(11, scenario1ON, indicesScenario1ON, script1);
+  
+  if (isBlinking && remainingBlinks > 0) {
+    if (millis() - blinkStartTime >= blinkInterval) {
+      blinkStartTime = millis();
+      ledState = !ledState;
+      mcp3.digitalWrite(OUTPUT_PINS3[7], ledState);
+      remainingBlinks--;
 
-        if (remainingBlinks == 0) {
-          isBlinking = false;
-          mcp3.digitalWrite(OUTPUT_PINS3[7], HIGH);
-        }
+      if (remainingBlinks == 0) {
+        isBlinking = false;
+        mcp3.digitalWrite(OUTPUT_PINS3[7], HIGH);
       }
     }
   }
   delay(20);
+}
+
+void handleScenarioButton(int btnIndex, const uint8_t* scenarioON, const int* indicesScenarioON, bool& script) {
+  if (btns[btnIndex].hold()) {
+    outputState[btnIndex] = !outputState[btnIndex];
+    mcp1.digitalWrite(OUTPUT_PINS1[btnIndex], outputState[btnIndex]);
+    Serial.print("btn: Scenario ");
+    Serial.print(btnIndex - 9);
+    Serial.print(" - ");
+    Serial.println(script ? "OFF" : "ON");
+    if (!script) {
+      Serial.println("Scenario (ON) started");
+      sequentialToggle(indicesScenarioON, sizeof(indicesScenarioON) / sizeof(indicesScenarioON[0]), 1, scenarioON);
+      Serial.println("Scenario (ON) finished");
+    } else {
+      Serial.println("Scenario (OFF) started");
+      sequentialToggle(indicesScenarioOFF, sizeof(indicesScenarioOFF) / sizeof(indicesScenarioOFF[0]), 0, scenarioOFF);
+      Serial.println("Scenario (OFF) finished");
+    }
+    script = !script;
+    delay(500); // Задержка для предотвращения зацикливания
+  }
 }
