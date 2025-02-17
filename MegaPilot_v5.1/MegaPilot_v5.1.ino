@@ -3,6 +3,7 @@
 #include <GyverOS.h>
 #include <GyverIO.h>
 
+GyverOS<2> OS;
 
 Adafruit_MCP23X17 mcp1;
 Adafruit_MCP23X17 mcp2;
@@ -35,9 +36,17 @@ bool checkScriptLed = true;
 
 VirtButton btns[16];  // Массив кнопок
 
-unsigned long previousMillis = 0; // Переменная для хранения времени
-const unsigned long intervalHold0 = 100; // Интервал в миллисекундах (100 мс)
-const unsigned long intervalClick = 500; // Интервал в миллисекундах (500 мс)
+unsigned long previousMillis = 0;
+const unsigned long intervalClick = 500;
+
+// Таймер для переключения сценариев
+unsigned long toggleTimer = 0;
+int toggleIndex = 0;
+bool toggleActive = false;
+const int* toggleIndices;
+const uint8_t* togglePins;
+int toggleSize;
+bool toggleState;
 
 unsigned long blinkStartTime = 0;
 int remainingBlinks = 0;
@@ -65,29 +74,45 @@ void printArray(const T* arr, size_t size) {
   Serial.println();
 }
 
-void sequentialToggle(const int* indices, int size, bool state, const uint8_t* outputPins) {
-  checkScript();
-  for (int i = 0; i < size; i++) {
-    uint8_t pinIndex = indices[i];
-    
-    for (int j = 0; j < 16; j++) {
-      if (OUTPUT_PINS1[j] == pinIndex) {
-        outputState[j] = state;
-        break;
+void startToggleSequence(const int* indices, int size, bool state, const uint8_t* outputPins) {
+  toggleIndices = indices;
+  togglePins = outputPins;
+  toggleSize = size;
+  toggleState = state;
+  toggleIndex = 0;
+  toggleTimer = millis();
+  toggleActive = true;
+}
+
+void processToggleSequence() {
+  
+  if (!toggleActive) return;
+
+  if (millis() - toggleTimer >= intervalClick) {
+    if (toggleIndex < toggleSize) {
+      uint8_t pinIndex = toggleIndices[toggleIndex];
+      
+      for (int j = 0; j < 16; j++) {
+        if (OUTPUT_PINS1[j] == pinIndex) {
+          outputState[j] = toggleState;
+          break;
+        }
       }
+
+      mcp1.digitalWrite(togglePins[toggleIndex], toggleState);
+      Serial.print("Pin ");
+      Serial.print(pinIndex);
+      Serial.print(" ");
+      Serial.println(toggleState ? "ON" : "OFF");
+
+      toggleIndex++;
+      toggleTimer = millis();
+    } else {
+      toggleActive = false;
     }
-
-    mcp1.digitalWrite(outputPins[i], state);
-    Serial.print("Pin ");
-    Serial.print(pinIndex);
-    Serial.print(" ");
-    Serial.print(state ? "ON" : "OFF");
-    Serial.println();
-
-    previousMillis = millis(); 
-    while (millis() - previousMillis < intervalClick) { }
   }
 }
+
 
 void checkScript() {
   checkScriptLed = !checkScriptLed;
@@ -118,103 +143,6 @@ void updateOutputs2(const uint8_t* pins, bool* stateArray) {
   }
 }
 
-// Обработка на клик
-void btnsClick(int i) {
-    if (i != 10 && i != 11) {
-      if (btns[i].click()) {
-        outputState[i] = !outputState[i];
-        mcp1.digitalWrite(OUTPUT_PINS1[i], outputState[i]);
-        Serial.print("btn: ");
-        Serial.print(i);
-        Serial.print(" - ");
-        Serial.println(outputState[i]);
-      }
-    }
-}
-
-void btns0Hold() {
-    if (btns[0].hold()) {
-      blinkLamp(1);
-      functionState[0] = !functionState[0];
-      mcp3.digitalWrite(OUTPUT_PINS3[0], functionState[0]);
-      Serial.print("\t Function ");
-      Serial.print(0);
-      Serial.print(": ");
-      Serial.println(!functionState[0]);
-      btns[0].clear();
-      delay(100);
-      functionState[0] = !functionState[0];
-      mcp3.digitalWrite(OUTPUT_PINS3[0], functionState[0]);
-      Serial.print("\t Function ");
-      Serial.print(0);
-      Serial.print(": ");
-      Serial.println(!functionState[0]);
-    }
-}
-
-void btns1Hold() {
-    if (btns[1].hold()) {
-      blinkLamp(2);
-      btns[1].clear();
-      functionState[1] = !functionState[1];
-      mcp3.digitalWrite(OUTPUT_PINS3[1], functionState[1]);
-      Serial.print("\t Function ");
-      Serial.print(1);
-      Serial.print(": ");
-      Serial.println(!functionState[1]);
-    }
-}
-
-void btns10Hold() {
-    if (btns[10].hold()) {
-      outputState[10] = !outputState[10];
-      mcp1.digitalWrite(OUTPUT_PINS1[10], outputState[10]);
-      Serial.print("btn: Scenario 2 - ");
-      Serial.println(script2 ? "OFF" : "ON");
-      if (!script2) {
-        Serial.println("Scenario 2 (ON) started");
-        sequentialToggle(indicesScenario2ON, sizeof(indicesScenario2ON) / sizeof(indicesScenario2ON[0]), 1, scenario2ON);
-        script1 = !script1;
-        Serial.println("Scenario 2 (ON) finished");
-      } 
-      if (script2) {
-        Serial.println("Scenario 2 (OFF) started");
-        sequentialToggle(indicesScenarioOFF, sizeof(indicesScenarioOFF) / sizeof(indicesScenarioOFF[0]), 0, scenarioOFF);
-        script1 = !script1;
-        Serial.println("Scenario 2 (OFF) finished");
-      }
-      script2 = !script2;
-      btns[10].clear();
-      delay(500);
-      checkScript();
-    }
-}
-
-void btns11Hold() {
-    if (btns[11].hold()) {
-      outputState[11] = !outputState[11];
-      mcp1.digitalWrite(OUTPUT_PINS1[11], outputState[11]);
-      Serial.print("btn: Scenario 1 - ");
-      Serial.println(script1 ? "OFF" : "ON");
-      if (!script1) {
-        Serial.println("Scenario 1 (ON) started");
-        sequentialToggle(indicesScenario1ON, sizeof(indicesScenario1ON) / sizeof(indicesScenario1ON[0]), 1, scenario1ON);
-        script2 = !script2;
-        Serial.println("Scenario 1 (ON) finished");
-      } 
-      if (script1) {
-        Serial.println("Scenario 1 (OFF) started");
-        sequentialToggle(indicesScenarioOFF, sizeof(indicesScenarioOFF) / sizeof(indicesScenarioOFF[0]), 0, scenarioOFF);
-        script2 = !script2;
-        Serial.println("Scenario 1 (OFF) finished");
-      }
-      script1 = !script1;
-      btns[11].clear();
-      delay(500);
-      checkScript();
-    }
-}
-
 void setup() {
   Serial.begin(9600);
   mcp1.begin_I2C(addr1); 
@@ -239,7 +167,7 @@ void setup() {
     btns[i].tick(!mcp2.digitalRead(INPUT_PINS[i]));
   }
 
-  Serial.println("Start MegaPilot_v5.0");
+  Serial.println("Start MegaPilot_v5.1");
   blinkLamp(5);
   printAllValues();
 }
@@ -247,12 +175,104 @@ void setup() {
 void loop() {
   for (int i = 0; i < 16; i++) {
     btns[i].tick(!mcp2.digitalRead(INPUT_PINS[i]));
+    
+    if (i != 10 && i != 11) {
+      if (btns[i].click()) {
+        outputState[i] = !outputState[i];
+        mcp1.digitalWrite(OUTPUT_PINS1[i], outputState[i]);
+        Serial.print("btn: ");
+        Serial.print(i);
+        Serial.print(" - ");
+        Serial.println(outputState[i]);
+        btns[i].clear();
+      }
+    }
 
-    btnsClick(i);
-    btns0Hold();
-    btns1Hold();
-    btns10Hold();
-    btns11Hold();
+    if (btns[0].hold()) {
+      blinkLamp(1);
+      functionState[0] = !functionState[0];
+      mcp3.digitalWrite(OUTPUT_PINS3[0], functionState[0]);
+      Serial.print("\t Function ");
+      Serial.print(0);
+      Serial.print(": ");
+      Serial.println(!functionState[0]);
+      btns[0].clear();
+      delay(100);
+      functionState[0] = !functionState[0];
+      mcp3.digitalWrite(OUTPUT_PINS3[0], functionState[0]);
+      Serial.print("\t Function ");
+      Serial.print(0);
+      Serial.print(": ");
+      Serial.println(!functionState[0]);
+    }
+
+    if (btns[1].hold()) {
+      blinkLamp(2);
+      functionState[1] = !functionState[1];
+      mcp3.digitalWrite(OUTPUT_PINS3[1], functionState[1]);
+      Serial.print("\t Function ");
+      Serial.print(1);
+      Serial.print(": ");
+      Serial.println(!functionState[1]);
+      btns[1].clear();
+    }
+
+    if (btns[3].hold()) {
+      blinkLamp(3);
+      functionState[3] = !functionState[3];
+      mcp3.digitalWrite(OUTPUT_PINS3[3], functionState[3]);
+      Serial.print("\t Function ");
+      Serial.print(3);
+      Serial.print(": ");
+      Serial.println(!functionState[3]);
+      btns[3].clear();
+      delay(100);
+      functionState[3] = !functionState[3];
+      mcp3.digitalWrite(OUTPUT_PINS3[3], functionState[3]);
+      Serial.print("\t Function ");
+      Serial.print(3);
+      Serial.print(": ");
+      Serial.println(!functionState[3]);
+    }
+
+    if (btns[10].hold()) {
+      
+      outputState[10] = !outputState[10];
+      mcp1.digitalWrite(OUTPUT_PINS1[10], outputState[10]);
+      Serial.print("btn: Scenario 2 - ");
+      Serial.println(script2 ? "OFF" : "ON");
+
+      if (!script2) {
+        Serial.println("Scenario 2 (ON) started");
+        startToggleSequence(indicesScenario2ON, sizeof(indicesScenario2ON) / sizeof(indicesScenario2ON[0]), 1, scenario2ON);
+      } else {
+        Serial.println("Scenario 2 (OFF) started");
+        startToggleSequence(indicesScenarioOFF, sizeof(indicesScenarioOFF) / sizeof(indicesScenarioOFF[0]), 0, scenarioOFF);
+      }
+
+      script2 = !script2;
+      btns[10].clear();
+    }
+
+    if (btns[11].hold()) {
+
+      outputState[11] = !outputState[11];
+      mcp1.digitalWrite(OUTPUT_PINS1[11], outputState[11]);
+      Serial.print("btn: Scenario 1 - ");
+      Serial.println(script1 ? "OFF" : "ON");
+
+      if (!script1) {
+        Serial.println("Scenario 1 (ON) started");
+        startToggleSequence(indicesScenario1ON, sizeof(indicesScenario1ON) / sizeof(indicesScenario1ON[0]), 1, scenario1ON);
+      } else {
+        Serial.println("Scenario 1 (OFF) started");
+        startToggleSequence(indicesScenarioOFF, sizeof(indicesScenarioOFF) / sizeof(indicesScenarioOFF[0]), 0, scenarioOFF);
+      }
+
+      script1 = !script1;
+      btns[11].clear();
+      
+    }
 
     if (isBlinking && remainingBlinks > 0) {
       if (millis() - blinkStartTime >= blinkInterval) {
@@ -260,6 +280,7 @@ void loop() {
         ledState = !ledState;
         mcp3.digitalWrite(OUTPUT_PINS3[7], ledState);
         remainingBlinks--;
+
         if (remainingBlinks == 0) {
           isBlinking = false;
           mcp3.digitalWrite(OUTPUT_PINS3[7], HIGH);
@@ -267,5 +288,6 @@ void loop() {
       }
     }
   }
-  delay(20);
+
+  processToggleSequence();
 }

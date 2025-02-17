@@ -72,13 +72,13 @@ void dotmatrixDisplay::printText(uint8_t modStart, uint8_t modEnd, char *text)
     {
         if (size == 0) {
             c = *text;
-            if (c == '▼')
+            if (c == 31)
             {
                 tiny = true;
                 text++;
                 c = *text;
             }
-            if (c == '▲')
+            if (c == 30)
             {
                 tiny = false;
                 text++;

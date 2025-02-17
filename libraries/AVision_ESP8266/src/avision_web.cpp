@@ -23,6 +23,7 @@ String web::_REQUEST(String name)
             return server->arg(i);
         }
     }
+    return "";
 }
 
 String web::mimeType(String requestPage)

@@ -236,11 +236,11 @@ void RGBleds::setPixelHeatColor(int Pixel, byte temperature)
     setLED(Pixel, pixel_color);
 }
 
-void RGBleds::fire()
+void RGBleds::fire(int SpeedDelay)
 {
     int Cooling = 50;
     int Sparking = 150;
-    int SpeedDelay = 30;
+    //int SpeedDelay = 30;
     int cooldown;
 
     // Step 1.  Cool down every cell a little
@@ -281,6 +281,10 @@ void RGBleds::fire()
 
     update(true);
     delay(SpeedDelay);
+}
+void RGBleds::fire()
+{
+    fire(30);
 }
 /*** MODE FIRE ***/
 

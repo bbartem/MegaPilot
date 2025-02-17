@@ -58,6 +58,7 @@ namespace AVision
         public:
             void rotate(bool on);
             void party(bool on);
+            void fire(int SpeedDelay);
             void fire();
 
             bool initialised = false;

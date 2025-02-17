@@ -52,6 +52,7 @@ byte wsCommunication::client_num(byte num)
             return clients[c].num;
         }
     }
+    return 0;
 }
 char *wsCommunication::client_endpoint(byte num)
 {
@@ -62,6 +63,7 @@ char *wsCommunication::client_endpoint(byte num)
             return clients[c].endpoint;
         }
     }
+    return nullptr;
 }
 
 void wsCommunication::event(uint8_t num, WStype_t type, uint8_t *payload, size_t length)

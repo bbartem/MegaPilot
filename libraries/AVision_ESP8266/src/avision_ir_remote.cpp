@@ -54,7 +54,6 @@ void IRremote::loop()
     decode_results results;
     if (irrecv->decode(&results) && (results.decode_type >= 0) && (results.decode_type < 1024))
     {
-
         if (!results.repeat)
         {
             last_code = results.value;
