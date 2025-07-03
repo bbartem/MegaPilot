@@ -32,4 +32,5 @@ Thumbs.db
 
 # Временные файлы
 *.tmp
-*.bak
+*.bak"*.rar" 
+"*.log" 
