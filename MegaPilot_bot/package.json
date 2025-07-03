@@ -1,0 +1,7 @@
+{
+  "dependencies": {
+    "express": "^4.21.2",
+    "mqtt": "^5.10.3",
+    "node-telegram-bot-api": "^0.66.0"
+  }
+}

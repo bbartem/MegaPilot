@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>MQTT Dashboard</title>
+</head>
+<body>
+    <h1>Device Status</h1>
+    <div id="status"></div>
+
+    <script>
+        const ws = new WebSocket('ws://localhost:4444');
+
+        ws.onmessage = (event) => {
+            const message = JSON.parse(event.data);
+            if (message.type === 'update') {
+                const { topic, payload } = message;
+                document.getElementById('status').innerText = `Topic: ${topic}, Payload: ${payload}`;
+            }
+        };
+    </script>
+</body>
+</html>

@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MQTT Мониторинг</title>
+    <script src="./mqtt.min.js"></script>
+    <style>
+        body { font-family: Arial, sans-serif; background-color: #f4f4f4; padding: 20px; }
+        .container { max-width: 800px; margin: auto; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); }
+        h2 { text-align: center; }
+        pre { background: #ddd; padding: 10px; border-radius: 5px; overflow-x: auto; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Мониторинг MQTT Брокера</h2>
+        <h3>Подключенные клиенты:</h3>
+        <ul id="clients"></ul>
+        <h3>Полученные сообщения:</h3>
+        <pre id="messages"></pre>
+    </div>
+
+    <script>
+        const brokerUrl = "ws://192.168.0.31:1883";
+        const client = mqtt.connect(brokerUrl);
+
+        const clientsList = document.getElementById("clients");
+        const messagesBox = document.getElementById("messages");
+        let clients = new Set();
+
+        client.on("connect", () => {
+            console.log("Connected to MQTT broker");
+            client.subscribe("#");
+        });
+
+        client.on("message", (topic, message) => {
+            const msg = `${new Date().toLocaleTimeString()} | ${topic}: ${message.toString()}`;
+            messagesBox.textContent = msg + "\n" + messagesBox.textContent;
+        });
+
+        client.on("end", () => {
+            console.log("Disconnected");
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,53 @@
+doctype html
+html(lang="en")
+head
+    meta(charset="UTF-8")
+    meta(name="viewport", content="width=device-width, initial-scale=1.0")
+    title MQTT Broker Monitor
+    link(rel="stylesheet", href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.9.3/css/bulma.min.css")
+body
+    section.section
+        .container
+            h1.title MQTT Broker Monitor
+            h2.subtitle Real-time MQTT Broker Monitoring
+
+            .columns
+                .column
+                    .box
+                        h3.title.is-4 Connected Clients
+                        ul#clients
+                .column
+                    .box
+                        h3.title.is-4 Topics
+                        ul#topics
+
+            .box
+                h3.title.is-4 Messages
+                table.table.is-fullwidth
+                    thead
+                        tr
+                            th Topic
+                            th Message
+                    tbody#messages
+
+            .box
+                h3.title.is-4 Current States
+                table.table.is-fullwidth
+                    thead
+                        tr
+                            th Topic
+                            th Value
+                    tbody#states
+
+    script(src="/socket.io/socket.io.js")
+    script.
+        const socket = io();
+
+        socket.on('mqtt-message', (data) => {
+            const statesTable = document.getElementById('states');
+            const row = statesTable.insertRow(0);
+            const topicCell = row.insertCell(0);
+            const valueCell = row.insertCell(1);
+            topicCell.textContent = data.topic;
+            valueCell.textContent = data.message;
+        });

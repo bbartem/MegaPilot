@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MQTT Control Panel</title>
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+        const socket = io();
+
+        socket.on('updateButtons', (newStates) => {
+            newStates.forEach((state, index) => {
+                const button = document.getElementById(`btn-${index}`);
+                if (button) {
+                    button.textContent = button.dataset.name + ' ' + (state ? 'ON' : 'OFF');
+                }
+            });
+        });
+    </script>
+    <style>
+        .button-container {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+        }
+        .button {
+            padding: 10px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <h1>MQTT Control Panel</h1>
+    <div class="button-container">
+        <% const buttonLabels = ["Сценарий_1", "Сценарий_2", "Пульт", "Подсобка", "Камера", "Балкон", "Сцена", "Розетки", "Микрофоны", "Коммутация", "Трансляция", "Мониторы", "Портал", "Свет(кафедра)", "Свет(Хор)", "Свет(рояль)", "Свет(1)", "Свет(2)", "Экран"]; %>
+        <% for (let i = 2; i <= 20; i++) { %>
+            <form action="/toggle/<%= i %>" method="POST">
+                <button id="btn-<%= i %>" class="button" type="submit" data-name="<%= buttonLabels[i - 2] %>">
+                    <%= buttonLabels[i - 2] %> <%= buttonStates[i] ? 'ON' : 'OFF' %>
+                </button>
+            </form>
+        <% } %>
+        <form action="/logs" method="GET">
+            <button class="button" type="submit">Show Logs</button>
+        </form>
+    </div>
+</body>
+</html>

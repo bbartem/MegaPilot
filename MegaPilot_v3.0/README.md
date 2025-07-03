@@ -34,3 +34,9 @@
 - function13 -> 5 реле
 - function14 -> 9 реле
 - function15 -> 11 реле
+
+
+
+
+
+

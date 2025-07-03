@@ -1,0 +1,8 @@
+{
+  "dependencies": {
+    "ejs": "^3.1.10",
+    "express": "^4.21.2",
+    "mqtt": "^5.10.3",
+    "socket.io": "^4.8.1"
+  }
+}

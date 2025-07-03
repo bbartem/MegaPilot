@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MQTT Dashboard</title>
+    <style>
+        body { font-family: Arial, sans-serif; display: flex; gap: 10px; flex-wrap: wrap; }
+        .box { border: 1px solid #ccc; padding: 10px; width: 30%; height: 300px; overflow-y: auto; }
+        .box h2 { margin: 0; }
+    </style>
+</head>
+<body>
+    <div class="box" id="clients"><h2>Clients</h2></div>
+    <div class="box" id="subscriptions"><h2>Subscriptions</h2></div>
+    <div class="box" id="messages"><h2>Messages</h2></div>
+
+    <script>
+        const ws = new WebSocket("ws://localhost:4444");
+
+        ws.onmessage = (event) => {
+            const data = JSON.parse(event.data);
+            let box;
+            switch (data.type) {
+                case 'client_connected':
+                    box = document.getElementById("clients");
+                    box.innerHTML += `<p>✅ ${data.data}</p>`;
+                    break;
+                case 'client_disconnected':
+                    box = document.getElementById("clients");
+                    box.innerHTML += `<p>❌ ${data.data}</p>`;
+                    break;
+                case 'subscribed':
+                    box = document.getElementById("subscriptions");
+                    box.innerHTML += `<p>${data.data.client} → ${JSON.stringify(data.data.subscriptions)}</p>`;
+                    break;
+                case 'message':
+                    box = document.getElementById("messages");
+                    box.innerHTML += `<p><b>${data.data.client}:</b> [${data.data.topic}] ${data.data.payload}</p>`;
+                    break;
+            }
+        };
+    </script>
+
+    <h1>Device Status</h1>
+    <div id="status"></div>
+
+    <script>
+        const ws = new WebSocket('ws://localhost:4444');
+
+        ws.onmessage = (event) => {
+            const message = JSON.parse(event.data);
+            if (message.type === 'update') {
+                const { topic, payload } = message;
+                document.getElementById('status').innerText = `Topic: ${topic}, Payload: ${payload}`;
+            }
+        };
+    </script>
+</body>
+</html>

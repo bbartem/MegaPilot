@@ -1,0 +1,253 @@
+'outputState/Scenario_1': false,
+'outputState/Scenario_2': false,
+'outputState/Remote_1': false,
+'outputState/Camera': false,
+'outputState/Stage': false,
+'outputState/Microphones': false,
+'outputState/Switching': false,
+'outputState/Broadcast': false,
+'outputState/Monitors': false,
+'outputState/Portal': false,
+'outputState/Light(lectern)': false,
+'outputState/Light(choir)': false,
+'outputState/Light(piano)': false,
+'outputState/Light(1)': false,
+'outputState/Light(2)': false,
+'outputState/Screen': true
+
+'functionState/Room': true,
+'functionState/Balcon': true,
+'functionState/Remote_2': true
+
+QoS
+retain включен
+
+'outputState/Scenario_1'
+'outputState/Scenario_2'
+'outputState/Remote_1'
+'outputState/Camera'
+'outputState/Stage':
+'outputState/Microphones'
+'outputState/Switching'
+'outputState/Broadcast'
+'outputState/Monitors'
+'outputState/Portal'
+'outputState/Light(lectern)'
+'outputState/Light(choir)'
+'outputState/Light(piano)'
+'outputState/Light(1)'
+'outputState/Light(2)'
+'outputState/Screen'
+
+'functionState/Room'
+'functionState/Balcon'
+'functionState/Remote_2'
+
+function generateKeyboard() {
+    return [
+        [`Сценарий_1`, `Сценарий_2`],
+        [`Пульт_1`, `Подсобка`],
+        [`Камера`, `Балкон`],
+        [`Сцена`, `Пульт_2`],
+        [`Микрофоны`, ' '],
+        [`Коммутация`, ' '],
+        [`Трансляция`, ' '],
+        [`Мониторы`, ' '],
+        [`Портал`, ' '],
+        [`Свет(кафедра)`, ' '],
+        [`Свет(Хор)`, ' '],
+        [`Свет(рояль)`, ' '],
+        [`Свет(1)`, ' '],
+        [`Свет(2)`, ' '],
+        [`Экран`, ' '],
+        ['Show Logs']
+    ];
+}
+
+Обозначения:
+'outputState/Scenario_1' - Сценарий_1
+'outputState/Scenario_2' - Сценарий_2
+'outputState/Remote_1' - Пульт_1
+'outputState/Camera' - Камера
+'outputState/Stage' - Сцена
+'outputState/Microphones' - Микрофоны
+'outputState/Switching' - Коммутация
+'outputState/Broadcast' - Трансляция
+'outputState/Monitors' - Мониторы
+'outputState/Portal' - Порталы
+'outputState/Light(lectern)' - Свет(кафедра)
+'outputState/Light(choir)' - Свет(Хор)
+'outputState/Light(piano)' - Свет(рояль)
+'outputState/Light(1)' - Свет(1)
+'outputState/Light(2)' - Свет(2)
+'outputState/Screen' - Экран
+'functionState/Room' - Подсобка
+'functionState/Balcon' - Балкон
+'functionState/Remote_2' - Пульт_2
+
+
+
+
+
+
+
+
+
+// Топики для каждого выхода
+const char* outputTopics[] = {
+  "outputState/Remote_1",
+  "outputState/Camera",
+  "outputState/Stage",
+  "outputState/Microphones",
+  "outputState/Switching",
+  "outputState/Broadcast",
+  "outputState/Monitors",
+  "outputState/Portal",
+  "outputState/Light(lectern)",
+  "outputState/Screen",
+  "outputState/Scenario_2",
+  "outputState/Scenario_1",
+  "outputState/Light(choir)",
+  "outputState/Light(piano)",
+  "outputState/Light(1)",
+  "outputState/Light(2)"
+};
+
+functionState/Room
+functionState/Balcon
+functionState/Remote_2
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+retain включен!
+Это топики:
+'outputState/Scenario_1'
+'outputState/Scenario_2'
+'outputState/Remote_1'
+'outputState/Camera'
+'outputState/Stage':
+'outputState/Microphones'
+'outputState/Switching'
+'outputState/Broadcast'
+'outputState/Monitors'
+'outputState/Portal'
+'outputState/Light(lectern)'
+'outputState/Light(choir)'
+'outputState/Light(piano)'
+'outputState/Light(1)'
+'outputState/Light(2)'
+'outputState/Screen'
+'functionState/Room'
+'functionState/Balcon'
+'functionState/Remote_2'
+
+Кнопки должны быть на панели Reply (ReplyKeyboardMarkup) 
+function generateKeyboard() {
+    return [
+        [`Сценарий_1`, `Сценарий_2`],
+        [`Пульт_1`, `Подсобка`],
+        [`Камера`, `Балкон`],
+        [`Сцена`, `Пульт_2`],
+        [`Микрофоны`, ' '],
+        [`Коммутация`, ' '],
+        [`Трансляция`, ' '],
+        [`Мониторы`, ' '],
+        [`Портал`, ' '],
+        [`Свет(кафедра)`, ' '],
+        [`Свет(Хор)`, ' '],
+        [`Свет(рояль)`, ' '],
+        [`Свет(1)`, ' '],
+        [`Свет(2)`, ' '],
+        [`Экран`, ' '],
+        ['Show Logs']
+    ];
+}
+На каждой кнопке должно быть состояние ON или OFF. Например: Сценарий_1 ON
+
+
+Обозначения, понадобиться чтобы привязать топики и кнопки:
+'outputState/Scenario_1' - Сценарий_1
+'outputState/Scenario_2' - Сценарий_2
+'outputState/Remote_1' - Пульт_1
+'outputState/Camera' - Камера
+'outputState/Stage' - Сцена
+'outputState/Microphones' - Микрофоны
+'outputState/Switching' - Коммутация
+'outputState/Broadcast' - Трансляция
+'outputState/Monitors' - Мониторы
+'outputState/Portal' - Порталы
+'outputState/Light(lectern)' - Свет(кафедра)
+'outputState/Light(choir)' - Свет(Хор)
+'outputState/Light(piano)' - Свет(рояль)
+'outputState/Light(1)' - Свет(1)
+'outputState/Light(2)' - Свет(2)
+'outputState/Screen' - Экран
+'functionState/Room' - Подсобка
+'functionState/Balcon' - Балкон
+'functionState/Remote_2' - Пульт_2
+
+
+
+bool buttonState[16];
+bool outputState[16];
+bool functionState[16];
+
+buttonState:
+0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 
+outputState:
+0 0 0 0 0 0 0 0 0 1 0 0 0 0 0 0 
+functionState:
+1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+
+buttonMqttOutputState[] = {Remote_1, Camera, Stage, Microphones, Switching, Broadcast, Monitors, Portal, Light(lectern), Screen, Scenario_2, Scenario_1, Light(choir), Light(piano), Light(1), Light(2)};
+
+buttonMqttFnctionState[] = {Room, Remote_2, Unknown, Balcon, Unknown, Unknown, Unknown, Unknown, Unknown, Unknown, Unknown, Unknown, Unknown, Unknown, Unknown, Unknown};
+
+- output0 -> Пульт
+- output1 -> Камера
+- output2 -> Розетки сцена
+- output3 -> Микрофоны
+- output4 -> Коммутация
+- output5 -> Трансляция
+- output6 -> Мониторы
+- output7 -> Порталы
+- output8 -> Свет(кафедра)
+- output9 -> Проектор
+- output10 -> Сценарий 2
+- output11 -> Сценарий 1
+- output12 -> Свет(Хор)
+- output13 -> Свет(рояль)
+- output14 -> Свет(сцена)
+- output15 -> Свет(сцена)
+#
+- function0 -> 1 реле Подсобка (дверь)
+- function1 -> 3 реле Розетка
+- function2 -> 4 Реле 
+- function3 ->  2 реле Балкон (дверь)
+- function4 -> 15 реле
+- function5 -> 13 реле
+- function6 -> 14 реле
+- function7 -> 16 реле Лампочка
+- function8 -> 8 реле
+- function9 -> 6 реле
+- function10 -> 10 реле
+- function11 -> 12 реле
+- function12 -> 7 реле
+- function13 -> 5 реле
+- function14 -> 9 реле
+- function15 -> 11 реле
